@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import "./signup.css";
 
 // Supabase client
@@ -125,12 +126,14 @@ export default function SignupPage() {
         {/* Logo */}
         <div className="signup-logo">
           <div className="logo-wrapper">
-            <img
+            <Image
               src="/Milwaukee-logo-red.png"
               width={200}
               height={90}
               alt="Milwaukee Tool"
               style={{ objectFit: 'contain' }}
+              priority
+              unoptimized
             />
           </div>
         </div>

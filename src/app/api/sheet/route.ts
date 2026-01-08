@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedData, invalidateCachePrefix } from "@/lib/cache";
-import { syncSingleEmployee } from "../sync-orgchart/route";
+import { syncSingleEmployee } from "@/lib/orgchart-sync";
 
 // Cache TTL: 15 minutes for employee list
 const EMPLOYEES_CACHE_TTL = 15 * 60 * 1000;
