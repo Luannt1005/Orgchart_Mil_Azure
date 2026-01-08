@@ -1,0 +1,11 @@
+# Ignore built files
+.next/
+out/
+node_modules/
+
+# Ignore OrgChart library (external dependency)
+src/lib/orgchart.js
+
+# Ignore test files
+*.test.js
+*.test.ts

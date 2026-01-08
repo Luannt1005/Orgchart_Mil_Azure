@@ -1,0 +1,87 @@
+﻿
+> orgchart_tti@0.1.0 build
+> next build
+
+   Γû▓ Next.js 15.5.9
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Failed   
+  to compile.:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+
+./src/app/Dashboard/component
+s/Emp_table.tsx
+Error:   [31mx[0m Expected 
+';', '}' or <eof>
+    ,-[[36;1;4mC:\Users\luan
+.nguyen\Desktop\test supabase
+\OrgChart_TTI_SHTP_Project_su
+pabase\src\app\Dashboard\comp
+onents\Emp_table.tsx[0m:57:1
+]
+ [2m54[0m |         // 
+Process and filter employee 
+data
+ [2m55[0m |         const 
+employees = useMemo(() => {
+ [2m56[0m |             // 
+eslint-disable-next-line @typ
+escript-eslint/no-explicit-an
+y\n        let filtered = 
+nodes.map((node: any) => ({
+ [2m57[0m | [35;1m,[0m[3
+5;1m-[0m[35;1m>[0m        
+ empId: node['Emp ID'] || 
+node.id || '',
+ [2m58[0m | [35;1m|[0m[3
+5;1m-[0m[35;1m>[0m        
+     title: node['Job 
+Title'] || node.title || '',
+    : [35;1m`[0m[35;1m---
+[0m[33;1m                 
+^[0m
+    : [35;1m`[0m[35;1m---
+[0m[35;1m-[0m [35;1mThis 
+is the expression part of an 
+expression statement[0m
+ [2m59[0m |                
+     dept: node['Dept'] || 
+node.dept || '',
+ [2m60[0m |                
+         experience: calculat
+eExperience(node['Joining\r\n
+ Date'] || node['Joining 
+Date'] || ''),
+ [2m60[0m |                
+             fullName: 
+node['FullName '] || 
+node['FullName'] || 
+node.name || 'Unknown',
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested 
+module:
+./src/app/Dashboard/component
+s/Emp_table.tsx
+./src/app/Dashboard/page.tsx
+
+
+> Build failed because of 
+webpack errors

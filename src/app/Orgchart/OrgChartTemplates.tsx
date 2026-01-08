@@ -1,6 +1,6 @@
 "use client";
 
-import OrgChart from "@balkangraph/orgchart.js";
+import OrgChart from "@/lib/orgchart";
 
 export function patchOrgChartTemplates() {
   if (typeof window === "undefined") return;

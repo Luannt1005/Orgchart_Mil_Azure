@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useMemo, useCallback } from "react";
-import OrgChart from "@balkangraph/orgchart.js";
+import OrgChart from "@/lib/orgchart";
 import { patchOrgChartTemplates } from "./OrgChartTemplates";
 import LoadingScreen from "@/components/loading-screen";
 import { useFilteredOrgData } from "@/hooks/useOrgData";

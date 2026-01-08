@@ -17,6 +17,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
     }, [filter]);
 
@@ -52,11 +53,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
 
     // Process and filter employee data
     const employees = useMemo(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let filtered = nodes.map((node: any) => ({
             empId: node['Emp ID'] || node.id || '',
             title: node['Job Title'] || node.title || '',
             dept: node['Dept'] || node.dept || '',
-            experience: calculateExperience(node['Joining\r\n Date'] || node['Joining Date'] || ''),
+            experience: calculateExperience(node['Joining Date'] || ''),
             fullName: node['FullName '] || node['FullName'] || node.name || 'Unknown',
             dlIdlStaff: node['DL/IDL/Staff'] || '',
             imageUrl: `https://raw.githubusercontent.com/Luannt1005/test-images/main/${node['Emp ID'] || node.id}.jpg`
@@ -162,6 +164,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
                                 {/* Name + Avatar */}
                                 <td className="px-3">
                                     <div className="flex items-center gap-2">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             src={emp.imageUrl}
                                             alt={emp.fullName}
