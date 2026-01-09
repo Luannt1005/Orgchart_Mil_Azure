@@ -15,6 +15,7 @@ export interface OrgNode {
   BU?: string; // Business Unit
   type?: string;
   orig_pid?: string | number;
+  [key: string]: any;
 }
 
 export interface ApiResponse<T> {
