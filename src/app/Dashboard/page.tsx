@@ -9,6 +9,7 @@ import DonutChart from './components/Donutchart_byType';
 import BUOrg3Chart from './components/bar_chart_BU_Org_3';
 import UpcomingResignTable from './components/upcoming_resign_table';
 import ManagerFilter from './components/ManagerFilter';
+import TitleFilter from './components/TitleFilter';
 import { useSheetData, getSubordinatesRecursive } from '@/hooks/useSheetData';
 import './design-tokens.css';
 
@@ -43,6 +44,14 @@ export default function DashboardPage() {
         setSelectedManagerName('');
     };
 
+    const handleTitleSelect = (title: string | null) => {
+        if (title) {
+            setActiveFilter({ type: 'title', value: title, label: title });
+        } else {
+            setActiveFilter({ type: 'all' });
+        }
+    };
+
     // Calculate hierarchical nodes - always returns an array
     const dashboardNodes = useMemo(() => {
         if (!nodes || nodes.length === 0) {
@@ -55,6 +64,38 @@ export default function DashboardPage() {
         const subordinates = getSubordinatesRecursive(nodes, selectedManagerId);
         return managerNode ? [managerNode, ...subordinates] : subordinates;
     }, [nodes, selectedManagerId]);
+
+    // Calculate filtered nodes for charts
+    const filteredDashboardNodes = useMemo(() => {
+        let current = dashboardNodes;
+
+        if (activeFilter.type === 'title' && activeFilter.value) {
+            const keywords = activeFilter.value.toLowerCase().split(" ");
+            current = current.filter((node: any) => {
+                const title = (node['Job Title'] || node.title || '').toLowerCase();
+                return keywords.every((k: string) => title.includes(k));
+            });
+        } else if (activeFilter.type === 'staff') {
+            current = current.filter((n: any) => (n['DL/IDL/Staff'] || '').toLowerCase().includes('staff'));
+        } else if (activeFilter.type === 'idl') {
+            current = current.filter((n: any) => (n['DL/IDL/Staff'] || '').toLowerCase().includes('idl'));
+        } else if (activeFilter.type === 'type' && activeFilter.value) {
+            const typeValue = activeFilter.value.toLowerCase();
+            current = current.filter((node: any) => {
+                const dlIdlStaff = (node['DL/IDL/Staff'] || '').toLowerCase();
+                if (typeValue === 'staff') return dlIdlStaff.includes('staff');
+                if (typeValue === 'idl') return dlIdlStaff.includes('idl');
+                if (typeValue === 'dl') return !dlIdlStaff.includes('staff') && !dlIdlStaff.includes('idl');
+                return true;
+            });
+        }
+
+        // Note: Tenure filter is quite complex and handled in EmployeeTable. 
+        // For now, we skip reapplying tenure filter to charts to avoid code duplication and performance hit,
+        // unless strictly required. The user request focused on 'Title' filter.
+
+        return current;
+    }, [dashboardNodes, activeFilter]);
 
     return (
         /* ===== PAGE WRAPPER - 100vh NO SCROLL ===== */
@@ -106,14 +147,27 @@ export default function DashboardPage() {
 
                     <div className="h-6 w-px bg-gray-200"></div>
 
-                    {/* Manager Filter */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Hierarchy:</span>
-                        <ManagerFilter
-                            nodes={nodes}
-                            onSelect={handleManagerSelect}
-                            selectedManagerId={selectedManagerId}
-                        />
+                    {/* Filters */}
+                    <div className="flex items-center gap-3">
+                        {/* Title Filter */}
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Title:</span>
+                            <TitleFilter
+                                nodes={dashboardNodes} // Pass available nodes in current hierarchy
+                                onSelect={handleTitleSelect}
+                                selectedTitle={activeFilter.type === 'title' ? activeFilter.value || null : null}
+                            />
+                        </div>
+
+                        {/* Manager Filter */}
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Hierarchy:</span>
+                            <ManagerFilter
+                                nodes={nodes}
+                                onSelect={handleManagerSelect}
+                                selectedManagerId={selectedManagerId}
+                            />
+                        </div>
                     </div>
                 </div>
             </header>
@@ -131,7 +185,7 @@ export default function DashboardPage() {
                                 className="grid grid-cols-6 gap-3"
                                 onFilterChange={handleFilterChange}
                                 activeFilter={activeFilter}
-                                nodes={dashboardNodes}
+                                nodes={dashboardNodes} // Keep using dashboardNodes to show overview stats
                                 loading={nodesLoading}
                                 isFiltered={!!selectedManagerId || activeFilter.type !== 'all'}
                             />
@@ -141,12 +195,12 @@ export default function DashboardPage() {
                         <div className="flex-[0.4] grid grid-cols-2 gap-4">
                             <DonutChart
                                 onFilterChange={handleFilterChange}
-                                nodes={dashboardNodes}
+                                nodes={filteredDashboardNodes} // Apply filters
                                 loading={nodesLoading}
                             />
                             <SeniorityChart
                                 onFilterChange={handleFilterChange}
-                                nodes={dashboardNodes}
+                                nodes={filteredDashboardNodes} // Apply filters
                                 loading={nodesLoading}
                             />
                         </div>
@@ -154,7 +208,7 @@ export default function DashboardPage() {
                         {/* Row 3: BU Org Chart */}
                         <div className="flex-[0.6]">
                             <BUOrg3Chart
-                                nodes={dashboardNodes}
+                                nodes={filteredDashboardNodes} // Apply filters
                                 loading={nodesLoading}
                             />
                         </div>
@@ -172,7 +226,7 @@ export default function DashboardPage() {
                                 <span className="text-[10px] text-gray-400 font-medium">
                                     {(!selectedManagerId && activeFilter.type === 'all')
                                         ? 'Server-side pagination'
-                                        : `${dashboardNodes?.length || 0} total`}
+                                        : `${filteredDashboardNodes?.length || 0} total`}
                                 </span>
                             </div>
                             <div className="flex-1 min-h-0 overflow-hidden">
@@ -185,7 +239,7 @@ export default function DashboardPage() {
                                 ) : (
                                     <EmployeeTable
                                         filter={activeFilter}
-                                        nodes={dashboardNodes}
+                                        nodes={filteredDashboardNodes} // Use filtered nodes for consistency
                                         loading={nodesLoading}
                                         className="h-full"
                                     />
@@ -202,7 +256,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex-1 min-h-0 overflow-hidden">
                                 <UpcomingResignTable
-                                    nodes={dashboardNodes}
+                                    nodes={filteredDashboardNodes} // Apply filters
                                     loading={nodesLoading}
                                     className="h-full"
                                 />

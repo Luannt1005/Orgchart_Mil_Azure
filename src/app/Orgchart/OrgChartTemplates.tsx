@@ -148,31 +148,9 @@ export function patchOrgChartTemplates() {
 
 
 
-  // --- TEMPLATE BIG (Milwaukee Industrial Edition) ---
-  OrgChart.templates.big_v2 = Object.assign({}, OrgChart.templates.ana);
+  // --- TEMPLATE BIG Probation (Milwaukee Industrial Edition) ---
+  OrgChart.templates.big_v2 = Object.assign({}, OrgChart.templates.big);
 
-  // Industrial Sharp Shadow
-  OrgChart.templates.big_v2.defs =
-    `<filter x="-20%" y="-20%" width="140%" height="140%" id="mil-shadow">
-        <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
-        <feOffset dx="0" dy="2" result="offsetblur" />
-        <feComponentTransfer>
-            <feFuncA type="linear" slope="0.2" />
-        </feComponentTransfer>
-        <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-        </feMerge>
-    </filter>`;
-
-  OrgChart.templates.big_v2.size = [230, 330];
-
-  // Main Node Body: Solid White, Red Top Accent
-  OrgChart.templates.big_v2.size = [230, 380]; // 330 + 50
-
-  // ------------------------------
-  // Main Node Body
-  // ------------------------------
   OrgChart.templates.big_v2.node = `
 <rect x="0" y="50" height="330" width="230"
       fill="#82A762"
@@ -186,87 +164,17 @@ export function patchOrgChartTemplates() {
       rx="0" ry="0"></rect>
 `;
 
-  // ------------------------------
-  // Image
-  // ------------------------------
-  OrgChart.templates.big_v2.img_0 = `
-<clipPath id="{randId}">
-  <rect x="45" y="85" width="140" height="170"
-        rx="2" ry="2" fill="#ffffff"></rect>
-</clipPath>
 
-<image preserveAspectRatio="xMidYMid slice"
-       clip-path="url(#{randId})"
-       xlink:href="{val}"
-       x="45" y="85"
-       width="140" height="170"></image>
 
-<rect x="45" y="85" width="140" height="170"
-      rx="2" ry="2"
-      fill="none"
-      stroke="#DB011C"
-      stroke-width="3"></rect>
-`;
 
-  // ------------------------------
-  // Expand / Collapse Controls
-  // ------------------------------
-  OrgChart.templates.big_v2.expandCollapseSize = 40;
 
-  OrgChart.templates.big_v2.minus = `
-<rect x="15" y="15" height="24" width="24"
-      fill="#000"
-      rx="2" ry="2"></rect>
-<line x1="20" y1="27" x2="34" y2="27"
-      stroke="white"
-      stroke-width="3" />
-`;
 
-  OrgChart.templates.big_v2.plus = `
-<rect x="15" y="15" height="24" width="24"
-      fill="#DB011C"
-      rx="2" ry="2"></rect>
-<line x1="20" y1="27" x2="34" y2="27"
-      stroke="white"
-      stroke-width="3" />
-<line x1="27" y1="20" x2="27" y2="34"
-      stroke="white"
-      stroke-width="3" />
-`;
+  // --- TEMPLATE BIG Inderct report group (Milwaukee Industrial Edition) ---
+  OrgChart.templates.indirect_group = Object.assign({}, OrgChart.templates.group);
 
-  // ------------------------------
-  // Text Fields
-  // ------------------------------
-  OrgChart.templates.big_v2.field_0 = `
-<text data-width="210"
-      x="115" y="295"
-      text-anchor="middle"
-      fill="#000"
-      style="font-size:14px; font-weight:900; text-transform:uppercase;">
-  {val}
-</text>
-`;
-
-  OrgChart.templates.big_v2.field_1 = `
-<text data-width="210"
-      x="115" y="320"
-      text-anchor="middle"
-      fill="#DB011C"
-      style="font-size:12px; font-weight:700; text-transform:uppercase;">
-  {val}
-</text>
-`;
-
-  // ------------------------------
-  // Hide "up" button
-  // ------------------------------
-  OrgChart.templates.big_v2.up = "";
-
+  OrgChart.templates.indirect_group.link =
+    '<path stroke-linejoin="round" stroke="#1e90ff" stroke-width="2px" stroke-dasharray="6,6" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
 }
-
-
-
-
 
 
 

@@ -81,14 +81,19 @@ export async function POST(req: Request) {
     // Get existing Emp IDs
     const existingEmpIds = await getExistingEmpIds();
 
-    // Get Emp IDs from import file
+    // Get Emp IDs from import file (normalize to string)
+    // IMPORTANT: Normalize to string to avoid number vs string mismatch with DB
     const newEmpIds = new Set(
-      rows.map((row: any) => row["Emp ID"]).filter(Boolean)
+      rows
+        .map((row: any) => row["Emp ID"])
+        .filter((id: any) => id !== null && id !== undefined && String(id).trim() !== '')
+        .map((id: any) => String(id).trim())
     );
 
     // Find Emp IDs to delete (in database but not in new file)
     const empIdsToDelete: string[] = [];
     existingEmpIds.forEach((id, empId) => {
+      // empId in Map is already string (from getExistingEmpIds adjustment below)
       if (!newEmpIds.has(empId)) {
         empIdsToDelete.push(empId);
       }
@@ -105,7 +110,10 @@ export async function POST(req: Request) {
     let skippedCount = 0;
 
     rows.forEach((row: any) => {
-      const empId = row["Emp ID"];
+      const rawId = row["Emp ID"];
+      if (rawId === null || rawId === undefined || String(rawId).trim() === '') return;
+
+      const empId = String(rawId).trim();
 
       // Skip if Emp ID already exists
       if (existingEmpIds.has(empId)) {

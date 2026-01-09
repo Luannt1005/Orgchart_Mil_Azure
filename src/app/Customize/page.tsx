@@ -162,7 +162,12 @@ const Customize = () => {
   }, [orgId, loading, loadChartData]);
 
   // Handle loading state after hooks
-  if (loading || groupsLoading) return <LoadingScreen />;
+  if (loading || groupsLoading)
+    return (
+      <div className="fixed inset-0 z-50 bg-white flex items-center justify-center">
+        <LoadingScreen />
+      </div>
+    );
 
   /* ================= CREATE NEW ORGCHART ================= */
   const handleCreateOrgChart = async () => {
@@ -332,21 +337,28 @@ const Customize = () => {
     }
   };
 
-
-
   return (
-    <div className="w-full h-screen relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col overflow-hidden pt-4">
-      {/* Header Toolbar - Dark Theme for Better Visibility */}
-      <div className="z-20 bg-gray-900/95 border-b border-gray-700 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-xl">
-        <div className="flex items-center gap-4">
+    <div className="flex h-screen w-full flex-col bg-slate-50 font-sans text-slate-900">
+
+      {/* ===== HEADER (Modern & Clean) ===== */}
+      <header className="z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
+        {/* Left: Title & Profile Selector */}
+        <div className="flex items-center gap-6">
           <div className="flex flex-col">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-2">Hồ sơ tùy chỉnh</label>
+            <h1 className="text-lg font-bold text-slate-800 leading-tight">Customize Org Chart</h1>
+            <p className="text-[11px] font-medium text-slate-500">Design & Edit Structures</p>
+          </div>
+
+          <div className="h-8 w-px bg-slate-200"></div>
+
+          <div className="flex flex-col">
+            <label className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Current Profile</label>
             <select
               value={orgId}
               onChange={(e) => setOrgId(e.target.value)}
-              className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-red-500 min-w-[280px] shadow-lg"
+              className="h-9 min-w-[240px] rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 outline-none transition-all hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
-              <option value="">-- Chọn hồ sơ --</option>
+              <option value="">-- Select a Profile --</option>
               {orgList.map((org) => (
                 <option key={org.orgchart_id} value={org.orgchart_id}>
                   {org.orgchart_name}
@@ -354,179 +366,187 @@ const Customize = () => {
               ))}
             </select>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => loadChartData(orgId)}
-              disabled={loadingChart || !orgId}
-              className="p-2.5 bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 text-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Tải lại"
-            >
-              <svg className={`w-5 h-5 ${loadingChart ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
-
-            <button
-              onClick={handleDelete}
-              disabled={!orgId}
-              className="p-2.5 bg-red-900/50 border border-red-800 rounded-lg hover:bg-red-900 text-red-300 hover:text-white transition-colors shadow-lg disabled:opacity-30 disabled:cursor-not-allowed"
-              title="Xóa hồ sơ"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-red-900/50"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-              Tạo mới
-            </button>
-          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="text-right flex flex-col items-end">
+        {/* Right: Actions Toolbar */}
+        <div className="flex items-center gap-3">
+          {/* Status Indicator */}
+          <div className="mr-2 flex flex-col items-end">
             {lastSaveTime && (
-              <span className="text-[10px] text-green-400 font-bold uppercase tracking-tighter">Lưu cuối: {lastSaveTime}</span>
+              <span className="text-[10px] font-semibold text-emerald-600">Saved: {lastSaveTime}</span>
             )}
             {hasChanges && (
-              <span className="text-[10px] text-orange-400 font-bold animate-pulse">● Có thay đổi chưa lưu</span>
+              <span className="animate-pulse text-[10px] font-bold text-amber-500">Unsaved Changes</span>
             )}
           </div>
+
+          {/* Action Buttons */}
+          <button
+            onClick={() => loadChartData(orgId)}
+            disabled={loadingChart || !orgId}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"
+            title="Reload Chart"
+          >
+            <svg className={`h-4 w-4 ${loadingChart ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+
+          <button
+            onClick={handleDelete}
+            disabled={!orgId}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-500 transition-colors hover:border-red-200 hover:bg-red-100 disabled:opacity-40"
+            title="Delete Profile"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+
+          <div className="h-8 w-px bg-slate-200 mx-1"></div>
+
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex h-9 items-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-all active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Profile
+          </button>
+
           <button
             onClick={handleSave}
             disabled={isSaving || !orgId || !hasChanges}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${hasChanges && orgId
-              ? "bg-white text-gray-900 shadow-2xl hover:scale-105"
-              : "bg-gray-700 text-gray-500 cursor-not-allowed"
+            className={`flex h-9 items-center gap-2 rounded-lg px-5 text-sm font-semibold text-white shadow-sm transition-all active:scale-95 ${hasChanges && orgId ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200" : "bg-slate-300 cursor-not-allowed"
               }`}
           >
             {isSaving ? (
-              <div className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
             ) : (
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
               </svg>
             )}
-            Lưu hồ sơ
+            Save Changes
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Main Chart Area */}
-      <div className="flex-1 relative">
+      {/* ===== MAIN CONTENT ===== */}
+      <main className="relative flex-1 overflow-hidden bg-slate-50">
 
         {/* Empty State */}
         {!orgId && !loadingChart && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center">
-            <div className="text-center space-y-6">
-              <div className="w-24 h-24 mx-auto bg-gray-800/50 rounded-full flex items-center justify-center border-4 border-gray-700">
-                <svg className="w-12 h-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div className="absolute inset-0 z-20 flex items-center justify-center p-4">
+            <div className="flex flex-col items-center text-center max-w-md">
+              <div className="mb-6 rounded-full bg-white p-6 shadow-md shadow-slate-200 ring-1 ring-slate-100">
+                <svg className="h-16 w-16 text-indigo-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
-              <div>
-                <h3 className="text-2xl font-black text-white mb-2">Chọn hoặc tạo hồ sơ</h3>
-                <p className="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
-                  Chọn một hồ sơ hiện có từ dropdown phía trên,<br />hoặc tạo hồ sơ mới để bắt đầu tùy chỉnh sơ đồ tổ chức.
-                </p>
-              </div>
+              <h2 className="mb-2 text-2xl font-bold text-slate-800">Select or Create a Profile</h2>
+              <p className="text-slate-500">
+                Start by selecting an existing chart profile from the dropdown above, or create a new one to begin customization.
+              </p>
             </div>
           </div>
         )}
 
-        <div ref={chartRef} className="w-full h-full relative z-10" />
+        {/* Chart Container */}
+        <div ref={chartRef} className="relative z-10 h-full w-full" />
 
+        {/* Loading Overlay for Chart Operations */}
         {loadingChart && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-white font-bold text-lg animate-pulse">Đang tải dữ liệu sơ đồ...</p>
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-[2px]">
+            <div className="flex flex-col items-center rounded-xl bg-white p-6 shadow-xl ring-1 ring-black/5">
+              <div className="mb-3 h-10 w-10 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600"></div>
+              <span className="text-sm font-semibold text-slate-600">Loading chart data...</span>
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Create Modal - Redesigned */}
+      {/* ===== CREATE MODAL ===== */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-gray-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-gray-700">
-            <div className="bg-gradient-to-r from-red-600 to-red-700 px-8 py-6 text-white relative">
-              <h2 className="text-2xl font-black uppercase tracking-tight">Tạo hồ sơ mới</h2>
-              <p className="text-red-100 text-xs font-medium uppercase tracking-widest mt-1">Customized Orgchart Profile</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-bold text-slate-800">Create New Profile</h3>
+                <p className="text-xs text-slate-500">Duplicate from existing department</p>
+              </div>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors"
+                className="text-slate-400 hover:text-slate-600"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <div className="p-8 space-y-6 bg-gray-800">
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest">Tên hồ sơ sơ đồ</label>
+            {/* Modal Body */}
+            <div className="space-y-5 p-6">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Profile Name</label>
                 <input
                   type="text"
                   value={newOrgName}
                   onChange={e => setNewOrgName(e.target.value)}
-                  placeholder="Ví dụ: Team Project A, Lãnh đạo cấp cao..."
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm font-semibold text-white placeholder-gray-500"
+                  placeholder="e.g. Engineering Restructure 2024"
+                  className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest">Khởi tạo từ phòng ban</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Source Department</label>
                 <select
                   value={selectedDept}
                   onChange={e => setSelectedDept(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm font-semibold text-white"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                 >
-                  <option value="">-- Chọn phòng ban mẫu --</option>
+                  <option value="">-- Choose Department --</option>
                   {groups.map(dept => (
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
-                <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
-                  Hệ thống sẽ sao chép cấu trúc hiện tại của phòng ban này vào hồ sơ mới của bạn.
+                <p className="text-[10px] text-slate-400">
+                  The chart will be initialized with data from this department.
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest">Ghi chú / Mô tả</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Description</label>
                 <textarea
                   value={newOrgDesc}
                   onChange={e => setNewOrgDesc(e.target.value)}
-                  placeholder="Mô tả mục đích sử dụng hồ sơ này..."
+                  placeholder="Optional notes about this chart..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm font-semibold text-white placeholder-gray-500 resize-none"
+                  className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 resize-none"
                 />
               </div>
+            </div>
 
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShowCreateModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-bold transition-all"
-                >
-                  Hủy bỏ
-                </button>
-                <button
-                  onClick={handleCreateOrgChart}
-                  disabled={creatingOrg || !newOrgName.trim() || !selectedDept}
-                  className="flex-[2] px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl font-bold shadow-lg shadow-red-900/30 transition-all flex items-center justify-center gap-2"
-                >
-                  {creatingOrg ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : "Khởi tạo ngay"}
-                </button>
-              </div>
+            {/* Modal Footer */}
+            <div className="flex items-center gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-4">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="flex-1 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateOrgChart}
+                disabled={creatingOrg || !newOrgName.trim() || !selectedDept}
+                className="flex-[2] flex items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {creatingOrg && (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                )}
+                Create Profile
+              </button>
             </div>
           </div>
         </div>

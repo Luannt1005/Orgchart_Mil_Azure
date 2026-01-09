@@ -58,7 +58,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
             empId: node['Emp ID'] || node.id || '',
             title: node['Job Title'] || node.title || '',
             dept: node['Dept'] || node.dept || '',
-            experience: calculateExperience(node['Joining Date'] || ''),
+            experience: calculateExperience(node['Joining\r\n Date'] || node['Joining Date'] || ''),
             fullName: node['FullName '] || node['FullName'] || node.name || 'Unknown',
             dlIdlStaff: node['DL/IDL/Staff'] || '',
             imageUrl: `https://raw.githubusercontent.com/Luannt1005/test-images/main/${node['Emp ID'] || node.id}.jpg`

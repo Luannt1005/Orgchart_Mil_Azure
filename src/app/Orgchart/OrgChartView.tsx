@@ -189,9 +189,6 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
         field_1: "title",
         img_0: "img",
       },
-      dottedLines: [
-        { from: "dept:EE & Motor Engineering:549682", to: 500011 },
-      ],
       nodeMenu: {
         addDepartment: {
           text: "Add new department",

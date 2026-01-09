@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef, useMemo, startTransition } from "react";
+import { useEffect, useState, useCallback, useMemo, startTransition } from "react";
 import {
   PlusIcon,
   ArrowPathIcon,
@@ -20,6 +20,7 @@ import {
 import styles from "@/app/SheetManager/sheet.module.css";
 import useSWR from 'swr';
 import { swrFetcher } from '@/lib/api-client';
+import SheetAddModal from "./SheetAddModal";
 
 interface SheetRow {
   id: string;
@@ -44,8 +45,24 @@ const VISIBLE_COLUMNS = [
   "Job Title",
   "Status",
   "Employee\r\n Type",
+  "Location",
+  "Last Working\r\nDay"
+];
+
+// Full list of columns for the "Add Employee" form
+const ADD_FORM_COLUMNS = [
+  "Emp ID",
+  "FullName ",
+  "Job Title",
+  "Dept",
+  "BU Org 3",
+  "Cost Center",
+  "Line Manager",
+  "Joining\r\n Date",
   "Status",
   "Location",
+  "Employee\r\n Type",
+  "DL/IDL/Staff",
   "Last Working\r\nDay"
 ];
 
@@ -139,11 +156,13 @@ const SheetManager = ({
   const [saving, setSaving] = useState(false);
   const [showApprovalOnly, setShowApprovalOnly] = useState(initialShowApprovalOnly);
 
+  // Modal state
+  const [showAddModal, setShowAddModal] = useState(false);
+
   // Debounce logic
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedFilters(filters);
-      // Optional: Reset to page 1 when search terms change
       setCurrentPage(1);
     }, 500);
 
@@ -153,8 +172,6 @@ const SheetManager = ({
   }, [filters]);
 
   // ======= SERVER-SIDE PAGINATION WITH SWR =======
-  // ======= SERVER-SIDE PAGINATION WITH SWR =======
-  // Construct Query String from filters
   const queryParams = new URLSearchParams();
   queryParams.set('page', currentPage.toString());
   queryParams.set('limit', ITEMS_PER_PAGE.toString());
@@ -177,13 +194,11 @@ const SheetManager = ({
     {
       revalidateOnFocus: false,
       dedupingInterval: 5000,
-      revalidateIfStale: true, // Allow revalidation when filters change
+      revalidateIfStale: true,
       keepPreviousData: true,
     }
   );
 
-  // Prefetch next page logic disabled when filtering to simplify complexity
-  // (We could enable it, but need to pass filters there too)
   const nextQueryParams = new URLSearchParams(queryParams);
   nextQueryParams.set('page', (currentPage + 1).toString());
   const nextPageUrl = `/api/sheet?${nextQueryParams.toString()}`;
@@ -198,7 +213,6 @@ const SheetManager = ({
     }
   );
 
-  // Extract pagination info from API response
   const totalRecords = apiResult?.total || 0;
   const totalPages = apiResult?.totalPages || 1;
 
@@ -206,13 +220,11 @@ const SheetManager = ({
   useEffect(() => {
     if (apiResult?.success && modifiedRows.size === 0) {
       startTransition(() => {
-        // Filter visible headers
         const apiHeaders = apiResult.headers || [];
         const visibleHeaders = apiHeaders.filter((h: string) =>
           VISIBLE_COLUMNS.includes(h) || VISIBLE_COLUMNS.includes(denormalizeFieldName(h))
         );
 
-        // If no headers from API, use default
         if (visibleHeaders.length === 0 && apiResult.data?.length > 0) {
           const firstRow = apiResult.data[0];
           const inferredHeaders = Object.keys(firstRow).filter(h =>
@@ -225,7 +237,6 @@ const SheetManager = ({
 
         setRows(apiResult.data || []);
 
-        // Lazy deep clone for originalRows
         requestIdleCallback?.(() => {
           setOriginalRows(structuredClone?.(apiResult.data || []) || JSON.parse(JSON.stringify(apiResult.data || [])));
         }) ?? setTimeout(() => {
@@ -243,19 +254,14 @@ const SheetManager = ({
     }
   }, [swrError]);
 
-  // Filter rows (keep approval filter client-side if needed, or handle exclusively)
   const filteredRows = useMemo(() => {
-    // Client-side filtering is REMOVED because it's now handled by the server API
-    // The 'rows' we receive are already filtered by the API.
     return rows;
   }, [rows]);
 
-  // Pending approvals count
   const pendingApprovals = useMemo(() => {
     return rows.filter(row => row.lineManagerStatus === 'pending');
   }, [rows]);
 
-  // Navigation handlers
   const goToPage = useCallback((page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -278,20 +284,60 @@ const SheetManager = ({
   };
 
   const handleAddRow = () => {
-    if (headers.length === 0) {
-      setHeaders(VISIBLE_COLUMNS);
+    setShowAddModal(true);
+  };
+
+  const handleSaveNewEmployee = async (formData: any): Promise<boolean> => {
+    try {
+      const dataToSave: any = {};
+      Object.keys(formData).forEach(key => {
+        let value = formData[key] || "";
+        if (DATE_COLUMNS.includes(key) && value) {
+          if (/\d{4}-\d{2}-\d{2}/.test(value)) {
+            dataToSave[normalizeFieldName(key)] = new Date(value).toISOString();
+          } else {
+            dataToSave[normalizeFieldName(key)] = value;
+          }
+        } else {
+          dataToSave[normalizeFieldName(key)] = value;
+        }
+      });
+
+      const response = await fetch("/api/sheet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add", data: dataToSave })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const newEmpId = formData["Emp ID"];
+        if (newEmpId) {
+          try {
+            await fetch("/api/sync-orgchart", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ employeeId: newEmpId })
+            });
+          } catch (syncErr) {
+            console.warn("Auto-sync failed", syncErr);
+          }
+        }
+
+        setSuccessMessage("✅ New employee added & synced successfully");
+        await mutate();
+        setTimeout(() => setSuccessMessage(null), 3000);
+        return true;
+      } else {
+        setError(result.error || "Failed to create employee");
+        return false;
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Network error while adding employee");
+      return false;
     }
-    const newId = `new-${Date.now()}`;
-    const newRow: SheetRow = { id: newId };
-    const targetHeaders = headers.length > 0 ? headers : VISIBLE_COLUMNS;
-
-    targetHeaders.forEach(header => {
-      newRow[header] = "";
-    });
-
-    setRows(prev => [newRow, ...prev]);
-    setModifiedRows(prev => new Set([...prev, newId]));
-    setEditingCell({ rowId: newId, header: targetHeaders[0] });
   };
 
   const handleSaveAll = async () => {
@@ -303,20 +349,18 @@ const SheetManager = ({
     try {
       for (const rowId of modifiedRows) {
         const row = rows.find((r) => r.id === rowId);
-        const isNewRow = rowId.startsWith("new-");
-        const originalRow: any = isNewRow ? {} : originalRows.find((r) => r.id === rowId);
-
-        if (!row || (!isNewRow && !originalRow)) continue;
+        const originalRow = originalRows.find((r) => r.id === rowId);
+        if (!row || !originalRow) continue;
 
         const dataToSave: { [key: string]: any } = {};
 
         headers.forEach((header) => {
           let value = row[header] || "";
-          let originalValue = isNewRow ? "" : (originalRow[header] || "");
+          let originalValue = originalRow[header] || "";
 
           if (DATE_COLUMNS.includes(header)) {
             value = formatDateToISO(value);
-            originalValue = isNewRow ? "" : formatDateToISO(originalValue);
+            originalValue = formatDateToISO(originalValue);
           }
 
           const normalizedHeader = normalizeFieldName(header);
@@ -330,22 +374,20 @@ const SheetManager = ({
         });
 
         const response = await fetch("/api/sheet", {
-          method: isNewRow ? "POST" : "PUT",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: isNewRow
-            ? JSON.stringify({ action: "add", data: dataToSave })
-            : JSON.stringify({ id: rowId, data: dataToSave }),
+          body: JSON.stringify({ id: rowId, data: dataToSave }),
         });
         const result = await response.json();
         if (result.success) successCount++;
       }
 
-      setSuccessMessage(`Successfully processed ${successCount} records.`);
+      setSuccessMessage(`Successfully updated ${successCount} records.`);
       setModifiedRows(new Set());
-      await mutate(); // Refresh current page
+      await mutate();
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
-      setError("Failed to save changes. Please check connection.");
+      setError("Failed to save changes.");
     } finally {
       setSaving(false);
     }
@@ -377,7 +419,6 @@ const SheetManager = ({
       const result = await response.json();
       if (result.success) {
         if (action === 'approve') {
-          // Sync ONLY this specific employee ID to avoid full sync lag
           await fetch("/api/sync-orgchart", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -395,7 +436,33 @@ const SheetManager = ({
     }
   };
 
-  // Handler to reject ALL pending requests
+  const handleDeleteRow = async (rowId: string, empName: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${empName}"?`)) return;
+
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/sheet?id=${rowId}`, {
+        method: 'DELETE'
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        // Trigger proper sync to remove from OrgChart
+        await fetch("/api/sync-orgchart", { method: "POST" });
+
+        setSuccessMessage(`Deleted "${empName}" successfully.`);
+        await mutate();
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        setError(result.error || "Failed to delete");
+      }
+    } catch (err) {
+      setError("Error deleting employee");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleRejectAll = async () => {
     const pendingCount = pendingApprovals.length;
     if (pendingCount === 0) {
@@ -403,11 +470,7 @@ const SheetManager = ({
       setTimeout(() => setError(null), 3000);
       return;
     }
-
-    const confirmed = window.confirm(
-      `⚠️ Are you sure you want to REJECT ALL ${pendingCount} pending requests?\n\nThis action cannot be undone.`
-    );
-    if (!confirmed) return;
+    if (!window.confirm(`⚠️ Reject all ${pendingCount} pending requests?`)) return;
 
     setSaving(true);
     try {
@@ -416,23 +479,21 @@ const SheetManager = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "rejectAll", data: {} }),
       });
-
       const result = await response.json();
       if (result.success) {
-        setSuccessMessage(`✓ Rejected ${result.count} pending requests.`);
+        setSuccessMessage(`✓ Rejected ${result.count} requests.`);
         await mutate();
         setTimeout(() => setSuccessMessage(null), 4000);
       } else {
-        setError(result.error || "Failed to reject all requests.");
+        setError(result.error);
       }
     } catch (err) {
-      setError("Error rejecting all requests.");
+      setError("Error rejecting all.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Handler to approve ALL pending requests
   const handleApproveAll = async () => {
     const pendingCount = pendingApprovals.length;
     if (pendingCount === 0) {
@@ -440,11 +501,7 @@ const SheetManager = ({
       setTimeout(() => setError(null), 3000);
       return;
     }
-
-    const confirmed = window.confirm(
-      `✅ Are you sure you want to APPROVE ALL ${pendingCount} pending requests?\n\nThis will update all Line Manager changes and sync to OrgChart.`
-    );
-    if (!confirmed) return;
+    if (!window.confirm(`✅ Approve all ${pendingCount} pending requests?`)) return;
 
     setSaving(true);
     try {
@@ -453,58 +510,42 @@ const SheetManager = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "approveAll", data: {} }),
       });
-
       const result = await response.json();
       if (result.success) {
-        // Sync OrgChart after approving all
         await fetch("/api/sync-orgchart", { method: "POST" });
-        setSuccessMessage(`✓ Approved ${result.count} requests & synced OrgChart.`);
+        setSuccessMessage(`✓ Approved ${result.count} requests.`);
         await mutate();
         setTimeout(() => setSuccessMessage(null), 4000);
       } else {
-        setError(result.error || "Failed to approve all requests.");
+        setError(result.error);
       }
     } catch (err) {
-      setError("Error approving all requests.");
+      setError("Error approving all.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Handler to DELETE ALL employees
   const handleDeleteAll = async () => {
-    // Double confirmation for this dangerous action
     const firstConfirm = window.confirm(
-      `⚠️ DANGER: You are about to DELETE ALL ${totalRecords} employees from the database!\n\nThis action is IRREVERSIBLE and will permanently remove all data.\n\nAre you sure you want to continue?`
+      `⚠️ DANGER: DELETE ALL ${totalRecords} employees?\n\nThis is IRREVERSIBLE.`
     );
     if (!firstConfirm) return;
 
-    const secondConfirm = window.confirm(
-      `🛑 FINAL WARNING!\n\nType "DELETE" in the next prompt to confirm deletion of ALL ${totalRecords} employee records.\n\nClick OK to proceed to the final confirmation.`
-    );
-    if (!secondConfirm) return;
-
-    const userInput = window.prompt(`Type "DELETE" to confirm removal of all ${totalRecords} employees:`);
-    if (userInput !== "DELETE") {
-      setError("Delete cancelled. You must type 'DELETE' exactly to confirm.");
-      setTimeout(() => setError(null), 4000);
-      return;
-    }
+    const userInput = window.prompt(`Type "DELETE" to confirm:`);
+    if (userInput !== "DELETE") return;
 
     setSaving(true);
     try {
-      const response = await fetch("/api/sheet?deleteAll=true", {
-        method: "DELETE",
-      });
-
+      const response = await fetch("/api/sheet?deleteAll=true", { method: "DELETE" });
       const result = await response.json();
       if (result.success) {
-        setSuccessMessage(`🗑️ Deleted all ${result.count} employees successfully.`);
+        setSuccessMessage(`🗑️ Deleted all ${result.count} employees.`);
         setCurrentPage(1);
         await mutate();
         setTimeout(() => setSuccessMessage(null), 5000);
       } else {
-        setError(result.error || "Failed to delete all data.");
+        setError(result.error);
       }
     } catch (err) {
       setError("Error deleting all data.");
@@ -513,7 +554,6 @@ const SheetManager = ({
     }
   };
 
-  // Loading state
   if (isLoading && rows.length === 0) {
     return (
       <div className={styles.spinner}>
@@ -596,7 +636,6 @@ const SheetManager = ({
             </button>
           )}
 
-          {/* Approve All & Reject All - only show when in approval mode with pending items */}
           {showApprovalOnly && pendingApprovals.length > 0 && (
             <>
               <button
@@ -604,7 +643,6 @@ const SheetManager = ({
                 disabled={saving}
                 className={`${styles.btnReset} flex items-center gap-2`}
                 style={{ backgroundColor: '#22c55e' }}
-                title="Approve all pending requests and sync OrgChart"
               >
                 <CheckCircleIcon className="w-4 h-4" />
                 Approve All ({pendingApprovals.length})
@@ -614,7 +652,6 @@ const SheetManager = ({
                 disabled={saving}
                 className={`${styles.btnReset} flex items-center gap-2`}
                 style={{ backgroundColor: '#f97316' }}
-                title="Reject all pending approval requests"
               >
                 <NoSymbolIcon className="w-4 h-4" />
                 Reject All ({pendingApprovals.length})
@@ -622,14 +659,12 @@ const SheetManager = ({
             </>
           )}
 
-          {/* Delete All Data - dangerous action */}
           {enableDeleteAll && (
             <button
               onClick={handleDeleteAll}
               disabled={saving || totalRecords === 0}
               className={`${styles.btnReset} flex items-center gap-2`}
               style={{ backgroundColor: '#dc2626' }}
-              title="Delete ALL employee data (DANGEROUS)"
             >
               <TrashIcon className="w-4 h-4" />
               Delete All
@@ -639,7 +674,6 @@ const SheetManager = ({
       </div>
 
       <div className="space-y-4">
-        {/* Messages */}
         {error && (
           <div className={styles.error}>
             <div className="flex items-center justify-between">
@@ -660,7 +694,6 @@ const SheetManager = ({
           </div>
         )}
 
-        {/* Filters */}
         <div className={styles.filterBox}>
           <div className={styles.filterRow}>
             {FILTER_COLUMNS.map((header) => {
@@ -702,7 +735,6 @@ const SheetManager = ({
           </div>
         </div>
 
-        {/* Table */}
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
@@ -710,7 +742,7 @@ const SheetManager = ({
                 {headers.map((header) => (
                   <th key={header}>{header.replace(/\r\n/g, ' ')}</th>
                 ))}
-                {showApprovalOnly && <th>Actions</th>}
+                <th className="w-24 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -748,32 +780,46 @@ const SheetManager = ({
                       </td>
                     );
                   })}
-
-                  {showApprovalOnly && (
-                    <td>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleApprovalAction(row.id, 'approve')}
-                          disabled={saving}
-                          className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
-                        >
-                          ✓
-                        </button>
-                        <button
-                          onClick={() => handleApprovalAction(row.id, 'reject')}
-                          disabled={saving}
-                          className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
-                        >
-                          ✗
-                        </button>
-                      </div>
-                    </td>
-                  )}
+                  <td className="text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      {showApprovalOnly && (
+                        <>
+                          <button
+                            onClick={() => handleApprovalAction(row.id, 'approve')}
+                            disabled={saving}
+                            className="p-1 text-green-500 hover:bg-green-50 rounded"
+                            title="Approve"
+                          >
+                            <CheckCircleIcon className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleApprovalAction(row.id, 'reject')}
+                            disabled={saving}
+                            className="p-1 text-orange-500 hover:bg-orange-50 rounded"
+                            title="Reject"
+                          >
+                            <NoSymbolIcon className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteRow(row.id, row['FullName '] || row.id);
+                        }}
+                        disabled={saving}
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                        title="Delete Employee"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {filteredRows.length === 0 && (
                 <tr>
-                  <td colSpan={headers.length + (showApprovalOnly ? 1 : 0)} className="text-center py-8 text-gray-500">
+                  <td colSpan={headers.length + 1} className="text-center py-8 text-gray-500">
                     No records found
                   </td>
                 </tr>
@@ -782,7 +828,6 @@ const SheetManager = ({
           </table>
         </div>
 
-        {/* Pagination - Server Side */}
         <div className={styles.pagination}>
           <div className="flex items-center justify-between px-4">
             <div className={styles.toolbarInfo}>
@@ -790,47 +835,34 @@ const SheetManager = ({
               {totalRecords > 0 && <span className="ml-2 text-gray-500">({totalRecords} total)</span>}
             </div>
             <div className="flex items-center gap-2">
-              {/* First page */}
               <button
                 onClick={() => goToPage(1)}
                 disabled={currentPage === 1}
                 className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
-                title="First page"
               >
                 <ChevronDoubleLeftIcon className="w-4 h-4" />
               </button>
-
-              {/* Previous */}
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
-                title="Previous page"
               >
                 <ChevronLeftIcon className="w-4 h-4" />
               </button>
-
-              {/* Page info */}
               <span className="px-3 py-1 bg-gray-100 rounded font-medium">
                 {currentPage} / {totalPages}
               </span>
-
-              {/* Next */}
               <button
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
                 className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
-                title="Next page"
               >
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
-
-              {/* Last page */}
               <button
                 onClick={() => goToPage(totalPages)}
                 disabled={currentPage >= totalPages}
                 className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
-                title="Last page"
               >
                 <ChevronDoubleRightIcon className="w-4 h-4" />
               </button>
@@ -838,6 +870,13 @@ const SheetManager = ({
           </div>
         </div>
       </div>
+
+      <SheetAddModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleSaveNewEmployee}
+        columns={ADD_FORM_COLUMNS}
+      />
     </div>
   );
 };
