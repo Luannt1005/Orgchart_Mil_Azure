@@ -39,7 +39,7 @@ const BUOrg3Chart: React.FC<BUOrg3ChartProps> = ({ className, nodes, loading = f
 
     if (loading) {
         return (
-            <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
+            <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
                 <div className="flex items-center justify-between mb-4 animate-pulse">
                     <div className="h-5 w-24 bg-gray-200 rounded"></div>
                     <div className="h-3 w-16 bg-gray-200 rounded"></div>
@@ -55,18 +55,18 @@ const BUOrg3Chart: React.FC<BUOrg3ChartProps> = ({ className, nodes, loading = f
 
     if (error || !chartData || chartData.length === 0) {
         return (
-            <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex items-center justify-center text-gray-400 text-sm ${className}`}>
+            <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex items-center justify-center text-muted text-sm ${className}`}>
                 No department data
             </div>
         );
     }
 
     return (
-        <div className={`bg-white rounded-xl shadow-sm p-2 h-full flex flex-col min-h-0 ${className}`}>
+        <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-2 h-full flex flex-col min-h-0 ${className}`}>
             {/* Header */}
             <div className="shrink-0 mb-2 flex items-center justify-between">
-                <h3 className="text-[15px] font-bold text-[#0F172A]">Departments</h3>
-                <span className="text-[12px] text-[#64748B]">{chartData.length} depts</span>
+                <h3 className="text-[15px] font-bold text-title">Departments</h3>
+                <span className="text-[12px] text-muted">{chartData.length} depts</span>
             </div>
 
             {/* Chart */}
@@ -89,24 +89,24 @@ const BUOrg3Chart: React.FC<BUOrg3ChartProps> = ({ className, nodes, loading = f
                             height={60} // Increased height for rotated labels
                             interval={0}
                             tick={{
-                                fill: '#1E293B',
+                                fill: 'var(--color-text-body)',
                                 fontSize: 11,
                                 fontWeight: 700
                             }}
-                            axisLine={{ stroke: '#E5E7EB' }}
+                            axisLine={{ stroke: 'var(--color-border-light)' }}
                             tickLine={false}
                         />
                         <Tooltip
                             isAnimationActive={false}
                             contentStyle={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #E2E8F0',
+                                backgroundColor: 'var(--color-bg-card)',
+                                border: '1px solid var(--color-border-light)',
                                 borderRadius: '8px',
                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                color: '#1E293B',
+                                color: 'var(--color-text-body)',
                                 fontSize: '12px'
                             }}
-                            itemStyle={{ color: '#1E293B' }}
+                            itemStyle={{ color: 'var(--color-text-body)' }}
                             formatter={(value: number | undefined) => [value ?? 0, 'Employees']}
                             labelFormatter={(label, payload) => payload?.[0]?.payload?.fullName || label}
                             labelStyle={{ color: '#64748B', fontWeight: 600, marginBottom: '4px' }}
@@ -121,7 +121,7 @@ const BUOrg3Chart: React.FC<BUOrg3ChartProps> = ({ className, nodes, loading = f
                                 dataKey="count"
                                 position="top"
                                 offset={8}
-                                style={{ fill: '#0F172A', fontWeight: 800, fontSize: 11 }}
+                                style={{ fill: 'var(--color-text-title)', fontWeight: 800, fontSize: 11 }}
                             />
                         </Bar>
                     </BarChart>

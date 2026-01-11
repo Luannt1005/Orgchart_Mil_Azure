@@ -85,7 +85,7 @@ export default function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-40 flex w-full bg-card drop-shadow-1 border-b border-[var(--color-border)] shadow-md">
+        <header className="sticky top-0 z-40 flex w-full bg-[var(--color-bg-card)] drop-shadow-1 border-b border-[var(--color-border)] shadow-md">
             <div className="h-15 flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
                 {/* Search Bar */}
                 <div className="hidden sm:block">
@@ -158,7 +158,7 @@ export default function Header() {
 
                         {/* Dropdown Start */}
                         {isDropdownOpen && (
-                            <div className="absolute right-0 mt-4 w-48 rounded-md border border-[var(--color-border)] bg-card shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                            <div className="absolute right-0 mt-4 w-48 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
                                 <ul className="flex flex-col gap-1 border-b border-[var(--color-border)] py-2">
                                     <li>
                                         <Link

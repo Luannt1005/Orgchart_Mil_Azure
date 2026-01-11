@@ -31,7 +31,7 @@ interface CardInfo {
 const StatCard: React.FC<StatCardProps> = ({ title, count, loading, onClick, isActive }) => {
     if (loading) {
         return (
-            <div className="h-[72px] bg-white rounded-lg shadow-sm flex flex-col items-center justify-center">
+            <div className="h-[72px] bg-[var(--color-bg-card)] rounded-lg shadow-sm flex flex-col items-center justify-center">
                 <div className="animate-pulse flex flex-col items-center gap-1">
                     <div className="h-5 bg-gray-200 rounded w-10"></div>
                     <div className="h-3 bg-gray-200 rounded w-16"></div>
@@ -44,7 +44,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, count, loading, onClick, isA
         <button
             onClick={onClick}
             className={`
-                h-[72px] w-full bg-white rounded-lg shadow-sm
+                h-[72px] w-full bg-[var(--color-bg-card)] rounded-lg shadow-sm
                 flex flex-col items-center justify-center gap-0.5
                 transition-all duration-200 cursor-pointer
                 border
@@ -55,11 +55,11 @@ const StatCard: React.FC<StatCardProps> = ({ title, count, loading, onClick, isA
             `}
         >
             {/* Count - Large number */}
-            <div className="text-xl font-bold text-[#0F172A] leading-tight">
+            <div className="text-xl font-bold text-title leading-tight">
                 {count.toLocaleString()}
             </div>
             {/* Label - Small uppercase */}
-            <div className="text-[10px] font-medium text-[#64748B] uppercase tracking-wide text-center px-1 truncate max-w-full">
+            <div className="text-[10px] font-medium text-muted uppercase tracking-wide text-center px-1 truncate max-w-full">
                 {title}
             </div>
         </button>

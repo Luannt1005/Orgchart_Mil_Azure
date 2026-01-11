@@ -147,7 +147,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
             {/* Table Body - Scrollable */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 <table className="w-full">
-                    <thead className="border-b border-gray-200 dark:border-[var(--color-border-light)] sticky top-0 z-10 bg-white dark:bg-[var(--color-bg-card)]">
+                    <thead className="border-b border-[var(--color-border-light)] sticky top-0 z-10 bg-[var(--color-bg-card)]">
                         <tr className="[&>th]:p-2!">
                             <th className="px-3 text-left text-[10px] font-semibold text-muted uppercase tracking-wider">
                                 Name
@@ -163,7 +163,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50 dark:divide-[var(--color-border-light)]">
+                    <tbody className="divide-y divide-[var(--color-border-light)]">
                         {currentEmployees.map((emp, index) => (
                             <tr key={emp.empId || index} className="hover:bg-gray-50 dark:hover:bg-blue-900/10 transition-colors [&>td]:p-2!">
                                 {/* Name + Avatar */}
@@ -223,7 +223,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
 
             {/* Pagination - Compact */}
             {totalPages > 1 && (
-                <div className="shrink-0 px-3 py-2 border-t border-gray-100 dark:border-[var(--color-border-light)] flex items-center justify-between bg-white dark:bg-[var(--color-bg-card)]">
+                <div className="shrink-0 px-3 py-2 border-t border-[var(--color-border-light)] flex items-center justify-between bg-[var(--color-bg-card)]">
                     <span className="text-[10px] text-muted">
                         {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, employees.length)} of {employees.length}
                     </span>
@@ -231,7 +231,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
                         <button
                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             disabled={currentPage === 1}
-                            className="px-2 py-1 text-[10px] font-medium rounded bg-gray-100 dark:bg-[#1E293B] dark:border dark:border-[var(--color-border-light)] text-muted hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="px-2 py-1 text-[10px] font-medium rounded bg-[var(--color-bg-page)] border border-[var(--color-border-light)] text-muted hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                             Prev
                         </button>
@@ -241,7 +241,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
                         <button
                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentPage === totalPages}
-                            className="px-2 py-1 text-[10px] font-medium rounded bg-gray-100 dark:bg-[#1E293B] dark:border dark:border-[var(--color-border-light)] text-muted hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="px-2 py-1 text-[10px] font-medium rounded bg-[var(--color-bg-page)] border border-[var(--color-border-light)] text-muted hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                             Next
                         </button>

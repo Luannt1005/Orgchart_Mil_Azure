@@ -67,12 +67,12 @@ const TitleFilter: React.FC<TitleFilterProps> = ({ nodes, onSelect, selectedTitl
             <button
                 className={`
                     w-48 py-1.5 px-3 text-xs font-medium text-left
-                    bg-white border rounded-lg flex items-center justify-between
+                    bg-[var(--color-bg-card)] border rounded-lg flex items-center justify-between
                     focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
                     transition-all duration-200
                     ${selectedTitle
                         ? 'border-blue-300 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                        : 'border-[var(--color-border-light)] text-body hover:border-gray-300'
                     }
                 `}
                 onClick={() => setIsOpen(!isOpen)}
@@ -92,21 +92,21 @@ const TitleFilter: React.FC<TitleFilterProps> = ({ nodes, onSelect, selectedTitl
                         </svg>
                     </div>
                 ) : (
-                    <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-3.5 h-3.5 text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute z-50 w-48 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                <div className="absolute z-50 w-48 mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border-light)] rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
                     {availableCategories.length === 0 ? (
-                        <div className="px-3 py-2 text-xs text-gray-400">No available roles</div>
+                        <div className="px-3 py-2 text-xs text-muted">No available roles</div>
                     ) : (
                         availableCategories.map((cat) => (
                             <button
                                 key={cat.value}
-                                className={`w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between transition-colors border-b border-gray-50 last:border-0 text-xs font-medium ${selectedTitle === cat.value ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                                className={`w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between transition-colors border-b border-[var(--color-border-light)] last:border-0 text-xs font-medium ${selectedTitle === cat.value ? 'bg-blue-50 text-blue-700' : 'text-body'
                                     }`}
                                 onClick={() => handleSelect(cat)}
                             >

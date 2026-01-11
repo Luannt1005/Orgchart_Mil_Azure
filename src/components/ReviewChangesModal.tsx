@@ -122,36 +122,36 @@ export default function ReviewChangesModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="w-full max-w-5xl bg-[var(--color-bg-card)] rounded-2xl shadow-2xl ring-1 ring-black/5 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden">
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gray-50/80 backdrop-blur-md sticky top-0 z-20">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--color-border-light)] bg-[var(--color-bg-page)]/80 backdrop-blur-md sticky top-0 z-20">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-amber-100 rounded-lg shadow-sm">
                             <ClockIcon className="w-6 h-6 text-amber-600" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-gray-900">Review Changes</h3>
-                            <p className="text-sm text-gray-500">
+                            <h3 className="text-xl font-bold text-title">Review Changes</h3>
+                            <p className="text-sm text-muted">
                                 {pendingRows.length} pending request{pendingRows.length !== 1 ? 's' : ''}
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-gray-200"
+                        className="p-1.5 text-muted hover:text-body hover:bg-[var(--color-bg-page)] rounded-full transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-[var(--color-border-light)]"
                     >
                         <XMarkIcon className="w-6 h-6" />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-0 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent bg-white">
+                <div className="flex-1 overflow-y-auto p-0 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent bg-[var(--color-bg-card)]">
                     {pendingRows.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                            <ShieldCheckIcon className="w-20 h-20 mb-4 text-gray-200" />
-                            <p className="text-lg font-medium text-gray-500">No pending changes</p>
-                            <p className="text-sm text-gray-400">Everything is up to date!</p>
+                        <div className="flex flex-col items-center justify-center h-64 text-muted">
+                            <ShieldCheckIcon className="w-20 h-20 mb-4 text-[var(--color-border)]" />
+                            <p className="text-lg font-medium text-body">No pending changes</p>
+                            <p className="text-sm text-muted">Everything is up to date!</p>
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
@@ -164,14 +164,15 @@ export default function ReviewChangesModal({
                                             checked={pendingRows.length > 0 && selectedIds.size === pendingRows.length}
                                             onChange={handleSelectAll}
                                         />
+
                                     </th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Employee</th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                                    <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">Type</th>
+                                    <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">Employee</th>
+                                    <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">Details</th>
+                                    <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 bg-white">
+                            <tbody className="divide-y divide-[var(--color-border-light)] bg-[var(--color-bg-card)]">
                                 {pendingRows.map((row) => {
                                     const isDelete = row.lineManagerStatus === 'pending_delete';
                                     const isProcessing = processingId === row.id || loading;
@@ -205,18 +206,18 @@ export default function ReviewChangesModal({
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-semibold text-gray-900">{row["FullName "] || row["FullName"] || "Unknown"}</span>
-                                                    <span className="text-xs text-gray-500 font-mono mt-0.5">{row["Emp ID"]}</span>
+                                                    <span className="text-sm font-semibold text-title">{row["FullName "] || row["FullName"] || "Unknown"}</span>
+                                                    <span className="text-xs text-muted font-mono mt-0.5">{row["Emp ID"]}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 {isDelete ? (
-                                                    <span className="text-sm text-gray-600 flex items-center gap-1">
+                                                    <span className="text-sm text-body flex items-center gap-1">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                                                         Request to remove record.
                                                     </span>
                                                 ) : (
-                                                    <div className="text-sm text-gray-600 space-y-1.5">
+                                                    <div className="text-sm text-body space-y-1.5">
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-gray-400 text-xs font-medium uppercase w-16 tracking-wide">Current:</span>
                                                             <span className="font-medium text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-xs">{row["Line Manager"] || "N/A"}</span>
@@ -258,7 +259,7 @@ export default function ReviewChangesModal({
 
                 {/* Footer */}
                 {pendingRows.length > 0 && (
-                    <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 backdrop-blur-md rounded-b-2xl flex justify-between items-center z-20">
+                    <div className="px-6 py-4 border-t border-[var(--color-border-light)] bg-[var(--color-bg-page)]/80 backdrop-blur-md rounded-b-2xl flex justify-between items-center z-20">
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             {selectedIds.size > 0 && (
                                 <span className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md font-medium border border-indigo-100">

@@ -230,7 +230,7 @@
 
     /* High contrast text for Dark Mode */
     --color-text-title: #FFFFFF;
-    --color-text-body: #A1A1AA;
+    --color-text-body: #ffffff;
     /* Zinc 400 */
     --color-text-muted: #64748B;
     --color-text-light: #475569;

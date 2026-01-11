@@ -103,7 +103,7 @@ export default function DashboardPage() {
         <DashboardContainer className="pt-0">
 
             {/* ===== HEADER BAR (40px) ===== */}
-            <header className="h-10 shrink-0 layout-header px-5 flex items-center justify-between">
+            <header className="h-20 shrink-0 layout-header px-5 flex items-center justify-between">
                 {/* Left: Title */}
 
                 <div>

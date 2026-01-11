@@ -97,21 +97,21 @@ const SeniorityChart: React.FC<SeniorityChartProps> = ({ className, onFilterChan
                 onClick={() => onFilterChange?.({ type: 'staff', value: 'Staff', label: 'Type: Staff' })}
             >
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS.Staff }}></span>
-                <span className="text-[#334155] font-medium">Staff</span>
+                <span className="text-body font-medium">Staff</span>
             </button>
             <button
                 className="flex items-center gap-1.5 text-xs hover:opacity-70 transition-opacity"
                 onClick={() => onFilterChange?.({ type: 'idl', value: 'IDL', label: 'Type: IDL' })}
             >
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS.IDL }}></span>
-                <span className="text-[#334155] font-medium">IDL</span>
+                <span className="text-body font-medium">IDL</span>
             </button>
         </div>
     );
 
     if (loading) {
         return (
-            <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
+            <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
                 <div className="flex items-center justify-between mb-4 animate-pulse">
                     <div className="h-5 w-32 bg-gray-200 rounded"></div>
                     <div className="flex gap-2">
@@ -130,7 +130,7 @@ const SeniorityChart: React.FC<SeniorityChartProps> = ({ className, onFilterChan
 
     if (error) {
         return (
-            <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
+            <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
                 <div className="text-center text-red-500 flex-1 flex items-center justify-center text-sm">
                     Error loading data
                 </div>
@@ -139,20 +139,20 @@ const SeniorityChart: React.FC<SeniorityChartProps> = ({ className, onFilterChan
     }
 
     return (
-        <div className={`bg-white rounded-xl shadow-sm p-1 h-full flex flex-col min-h-0 ${className}`}>
+        <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-1 h-full flex flex-col min-h-0 ${className}`}>
             {/* Header */}
             <div className="shrink-0 mb-4 flex items-center justify-between">
                 <div>
-                    <h3 className="text-[13px] pl-1 py-1 font-bold text-[#0F172A]">Headcount by Tenure</h3>
+                    <h3 className="text-[13px] pl-1 py-1 font-bold text-title">Headcount by Tenure</h3>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-sm bg-[#8B5CF6]"></span>
-                        <span className="text-[11px] font-semibold text-[#334155]">Staff</span>
+                        <span className="text-[11px] font-semibold text-body">Staff</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-sm bg-[#F59E0B]"></span>
-                        <span className="text-[11px] font-semibold text-[#334155]">IDL</span>
+                        <span className="text-[11px] font-semibold text-body">IDL</span>
                     </div>
                 </div>
             </div>
@@ -177,24 +177,24 @@ const SeniorityChart: React.FC<SeniorityChartProps> = ({ className, onFilterChan
                         <XAxis
                             dataKey="name"
                             tick={{
-                                fill: '#1E293B',
+                                fill: 'var(--color-text-body)',
                                 fontSize: 11,
                                 fontWeight: 700
                             }}
-                            axisLine={{ stroke: '#E5E7EB' }}
+                            axisLine={{ stroke: 'var(--color-border-light)' }}
                             tickLine={false}
                         />
                         <Tooltip
                             isAnimationActive={false}
                             contentStyle={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #E2E8F0',
+                                backgroundColor: 'var(--color-bg-card)',
+                                border: '1px solid var(--color-border-light)',
                                 borderRadius: '8px',
                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                color: '#1E293B',
+                                color: 'var(--color-text-body)',
                                 fontSize: '12px'
                             }}
-                            itemStyle={{ color: '#1E293B' }}
+                            itemStyle={{ color: 'var(--color-text-body)' }}
                             formatter={(value: any, name: any) => [value, name]}
                             labelFormatter={(label) => chartData.find(d => d.name === label)?.fullName || label}
                             labelStyle={{ color: '#64748B', fontWeight: 600, marginBottom: '4px' }}
@@ -224,7 +224,7 @@ const SeniorityChart: React.FC<SeniorityChartProps> = ({ className, onFilterChan
                                 dataKey="IDL"
                                 position="top"
                                 offset={8}
-                                style={{ fill: '#0F172A', fontWeight: 800, fontSize: 11 }}
+                                style={{ fill: 'var(--color-text-title)', fontWeight: 800, fontSize: 11 }}
                                 formatter={(value: any) => value > 0 ? value : ''}
                             />
                         </Bar>

@@ -83,12 +83,12 @@ const ManagerFilter: React.FC<ManagerFilterProps> = ({ nodes, onSelect, selected
                         placeholder="Search person..."
                         className={`
                             w-44 py-1.5 text-xs font-medium
-                            bg-white border rounded-lg
+                            bg-[var(--color-bg-card)] border rounded-lg
                             focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent
                             transition-all duration-200
                             ${selectedManagerId
                                 ? 'border-purple-300 bg-purple-50 text-purple-700 pl-9 pr-8' // Padding for avatar + close button
-                                : 'border-gray-200 text-gray-700 px-3'
+                                : 'border-[var(--color-border-light)] text-body px-3'
                             }
                         `}
                         value={selectedManager ? selectedManager.name : searchTerm}
@@ -114,14 +114,14 @@ const ManagerFilter: React.FC<ManagerFilterProps> = ({ nodes, onSelect, selected
                             </svg>
                         </button>
                     ) : (
-                        <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     )}
                 </div>
 
                 {isOpen && filteredNodes.length > 0 && (
-                    <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto left-0">
+                    <div className="absolute z-50 w-56 mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border-light)] rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto left-0">
                         {filteredNodes.map((node) => (
                             <button
                                 key={node.id}
@@ -142,8 +142,8 @@ const ManagerFilter: React.FC<ManagerFilterProps> = ({ nodes, onSelect, selected
                                     }}
                                 />
                                 <div className="flex flex-col min-w-0">
-                                    <span className="text-xs font-semibold text-[#0F172A] truncate">{node.name}</span>
-                                    <span className="text-[9px] text-[#94A3B8] truncate">{node.title}</span>
+                                    <span className="text-xs font-semibold text-title truncate">{node.name}</span>
+                                    <span className="text-[9px] text-muted truncate">{node.title}</span>
                                 </div>
                             </button>
                         ))}
@@ -158,7 +158,7 @@ const ManagerFilter: React.FC<ManagerFilterProps> = ({ nodes, onSelect, selected
                         <button
                             key={manager.id}
                             onClick={() => onSelect(manager.id, manager.name)}
-                            className="group flex items-center gap-1.5 pl-1 pr-2.5 py-1 bg-white border border-gray-200 hover:border-purple-300 hover:bg-purple-50 rounded-full transition-all shadow-sm"
+                            className="group flex items-center gap-1.5 pl-1 pr-2.5 py-1 bg-[var(--color-bg-card)] border border-[var(--color-border-light)] hover:border-purple-300 hover:bg-purple-50 rounded-full transition-all shadow-sm"
                             title={manager.title}
                         >
                             <img

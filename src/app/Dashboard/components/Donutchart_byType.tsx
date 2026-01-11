@@ -51,7 +51,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
             <text
                 x={x}
                 y={y}
-                fill="#334155"
+                fill="var(--color-text-body)"
                 textAnchor={x > cx ? 'start' : 'end'}
                 dominantBaseline="central"
                 className="text-[10px] font-bold"
@@ -63,7 +63,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
 
     if (loading) {
         return (
-            <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
+            <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
                 <div className="flex-1 flex flex-col items-center justify-center gap-4 animate-pulse">
                     <div className="w-48 h-48 rounded-full border-[16px] border-gray-100"></div>
                 </div>
@@ -73,7 +73,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
 
     if (!chartData || chartData.length === 0) {
         return (
-            <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
+            <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex flex-col ${className}`}>
                 <div className="text-center text-gray-400 flex-1 flex items-center justify-center text-sm">
                     No data available
                 </div>
@@ -82,9 +82,9 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
     }
 
     return (
-        <div className={`bg-white rounded-xl shadow-sm p-4 h-full flex flex-col min-h-0 ${className}`}>
+        <div className={`bg-[var(--color-bg-card)] rounded-xl shadow-sm p-4 h-full flex flex-col min-h-0 ${className}`}>
             <div className="shrink-0 mb-2">
-                <h3 className="text-[13px] pl-1 font-bold text-[#0F172A]">Employee Type</h3>
+                <h3 className="text-[13px] pl-1 font-bold text-title">Employee Type</h3>
             </div>
 
             <div className="flex-1 min-h-0 relative">
@@ -134,11 +134,11 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
                         <Tooltip
                             isAnimationActive={false}
                             contentStyle={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #E2E8F0',
+                                backgroundColor: 'var(--color-bg-card)',
+                                border: '1px solid var(--color-border-light)',
                                 borderRadius: '8px',
                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                color: '#1E293B',
+                                color: 'var(--color-text-body)',
                                 fontSize: '12px'
                             }}
                             itemStyle={{ color: '#1E293B' }}
@@ -161,8 +161,8 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
                                                 onClick={() => onFilterChange?.({ type: 'type', value: entry.value, label: `Type: ${entry.value}` })}
                                             >
                                                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: dotColor }}></span>
-                                                <span className="text-[#334155] font-medium">{entry.value}</span>
-                                                <span className="text-[#64748B]">({data?.percentage}%)</span>
+                                                <span className="text-body font-medium">{entry.value}</span>
+                                                <span className="text-muted">({data?.percentage}%)</span>
                                             </button>
                                         );
                                     })}
@@ -173,8 +173,8 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
                 </ResponsiveContainer>
 
                 <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                    <div className="text-2xl font-bold text-[#0F172A]">{total}</div>
-                    <div className="text-[10px] text-[#64748B] uppercase tracking-wide">Total</div>
+                    <div className="text-2xl font-bold text-title">{total}</div>
+                    <div className="text-[10px] text-muted uppercase tracking-wide">Total</div>
                 </div>
             </div>
         </div>

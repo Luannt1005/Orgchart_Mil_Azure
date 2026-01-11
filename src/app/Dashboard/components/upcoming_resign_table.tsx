@@ -140,7 +140,7 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
 
     if (resigningEmployees.length === 0) {
         return (
-            <div className={`h-full flex items-center justify-center text-gray-400 ${className}`}>
+            <div className={`h-full flex items-center justify-center text-muted ${className}`}>
                 <div className="text-center">
                     <svg className="w-8 h-8 mx-auto mb-1 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -154,14 +154,14 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
     return (
         <div className={`h-full flex flex-col ${className}`}>
             {/* Structured Table */}
-            <div className="flex-1 overflow-auto custom-scrollbar bg-white dark:bg-[var(--color-bg-card)] relative">
+            <div className="flex-1 overflow-auto custom-scrollbar bg-[var(--color-bg-card)] relative">
                 <table className="w-full text-left border-collapse">
-                    <thead className="border-b border-gray-200 dark:border-[var(--color-border-light)]">
+                    <thead className="border-b border-[var(--color-border-light)]">
                         <tr>
-                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-4 text-[10px] font-bold text-muted uppercase tracking-wider w-[40%] text-center shadow-sm">Employee</th>
-                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-2 text-[10px] font-bold text-muted uppercase tracking-wider w-[25%] hidden sm:table-cell text-center shadow-sm">Dept</th>
-                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-2 text-[10px] font-bold text-muted uppercase tracking-wider w-[15%] text-center whitespace-nowrap shadow-sm">Seniority</th>
-                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-4 text-[10px] font-bold text-muted uppercase tracking-wider w-[20%] text-center whitespace-nowrap shadow-sm">LWD</th>
+                            <th className="sticky top-0 z-10 bg-[var(--color-bg-card)] py-1.5 px-4 text-[10px] font-bold text-muted uppercase tracking-wider w-[40%] text-center shadow-sm">Employee</th>
+                            <th className="sticky top-0 z-10 bg-[var(--color-bg-card)] py-1.5 px-2 text-[10px] font-bold text-muted uppercase tracking-wider w-[25%] hidden sm:table-cell text-center shadow-sm">Dept</th>
+                            <th className="sticky top-0 z-10 bg-[var(--color-bg-card)] py-1.5 px-2 text-[10px] font-bold text-muted uppercase tracking-wider w-[15%] text-center whitespace-nowrap shadow-sm">Seniority</th>
+                            <th className="sticky top-0 z-10 bg-[var(--color-bg-card)] py-1.5 px-4 text-[10px] font-bold text-muted uppercase tracking-wider w-[20%] text-center whitespace-nowrap shadow-sm">LWD</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -220,7 +220,7 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
 
             {/* Footer - Pagination */}
             {resigningEmployees.length > 0 && (
-                <div className="shrink-0 px-3 py-2 border-t border-gray-100 dark:border-[var(--color-border-light)] flex items-center justify-between bg-gray-50/50 dark:bg-[var(--color-bg-card)]">
+                <div className="shrink-0 px-3 py-2 border-t border-[var(--color-border-light)] flex items-center justify-between bg-[var(--color-bg-card)]">
                     <span className="text-[10px] text-muted font-medium">
                         showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, resigningEmployees.length)} of {resigningEmployees.length}
                     </span>
