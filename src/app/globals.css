@@ -1,15 +1,96 @@
 @import "tailwindcss";
 
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* ========================================
+   Global Design Tokens
+   ======================================== */
 :root {
   --background: #ffffff;
   --foreground: #c4a1a1;
+
+  /* ===== Color Palette ===== */
+  --color-primary: #C40000;
+  --color-primary-light: #FEE2E2;
+  --color-primary-dark: #991B1B;
+
+  --color-bg-page: #F5F7FA;
+  --color-bg-card: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+
+  --color-text-title: #0F172A;
+  --color-text-body: #334155;
+  --color-text-muted: #64748B;
+  --color-text-light: #94A3B8;
+
+  /* Chart Colors */
+  --color-chart-purple: #8B5CF6;
+  --color-chart-orange: #F59E0B;
+  --color-chart-blue: #3B82F6;
+  --color-chart-green: #10B981;
+  --color-chart-pink: #EC4899;
+  --color-chart-cyan: #06B6D4;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #c9aaaa;
+    --background: #0F172A;
     --foreground: #ffffff;
+
+    --color-bg-page: #0F172A;
+    /* Slate 900 */
+    --color-bg-card: #1E293B;
+    /* Slate 800 */
+    --color-border: #334155;
+    --color-border-light: #334155;
+
+    --color-text-title: #F8FAFC;
+    --color-text-body: #CBD5E1;
+    --color-text-muted: #94A3B8;
+    --color-text-light: #64748B;
   }
+}
+
+.dark,
+[data-theme='dark'] {
+  --background: #0F172A;
+  --foreground: #ffffff;
+
+  --color-bg-page: #0F172A;
+  --color-bg-card: #1E293B;
+  --color-border: #334155;
+  --color-border-light: #334155;
+
+  --color-text-title: #F8FAFC;
+  --color-text-body: #CBD5E1;
+  --color-text-muted: #94A3B8;
+  --color-text-light: #64748B;
+}
+
+/* Global Utility Classes */
+.text-title {
+  color: var(--color-text-title) !important;
+}
+
+.text-body {
+  color: var(--color-text-body) !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+.bg-page {
+  background-color: var(--color-bg-page) !important;
+}
+
+.bg-card {
+  background-color: var(--color-bg-card) !important;
 }
 
 html,
@@ -30,10 +111,4 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }

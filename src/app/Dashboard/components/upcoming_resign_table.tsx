@@ -145,7 +145,7 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
                     <svg className="w-8 h-8 mx-auto mb-1 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-[13px] pl-1 py-1 font-bold text-[#0F172A]">No upcoming resignations</p>
+                    <p className="text-[13px] pl-1 py-1 font-bold text-title">No upcoming resignations</p>
                 </div>
             </div>
         );
@@ -154,14 +154,14 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
     return (
         <div className={`h-full flex flex-col ${className}`}>
             {/* Structured Table */}
-            <div className="flex-1 overflow-auto custom-scrollbar bg-white relative">
+            <div className="flex-1 overflow-auto custom-scrollbar bg-white dark:bg-[var(--color-bg-card)] relative">
                 <table className="w-full text-left border-collapse">
-                    <thead className="border-b border-gray-200">
+                    <thead className="border-b border-gray-200 dark:border-[var(--color-border-light)]">
                         <tr>
-                            <th className="sticky top-0 z-10 bg-gray-50 py-1.5 px-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-[40%] text-center shadow-sm">Employee</th>
-                            <th className="sticky top-0 z-10 bg-gray-50 py-1.5 px-2 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-[25%] hidden sm:table-cell text-center shadow-sm">Dept</th>
-                            <th className="sticky top-0 z-10 bg-gray-50 py-1.5 px-2 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-[15%] text-center whitespace-nowrap shadow-sm">Seniority</th>
-                            <th className="sticky top-0 z-10 bg-gray-50 py-1.5 px-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-[20%] text-center whitespace-nowrap shadow-sm">LWD</th>
+                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-4 text-[10px] font-bold text-muted uppercase tracking-wider w-[40%] text-center shadow-sm">Employee</th>
+                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-2 text-[10px] font-bold text-muted uppercase tracking-wider w-[25%] hidden sm:table-cell text-center shadow-sm">Dept</th>
+                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-2 text-[10px] font-bold text-muted uppercase tracking-wider w-[15%] text-center whitespace-nowrap shadow-sm">Seniority</th>
+                            <th className="sticky top-0 z-10 bg-gray-50 dark:bg-[var(--color-bg-card)] py-1.5 px-4 text-[10px] font-bold text-muted uppercase tracking-wider w-[20%] text-center whitespace-nowrap shadow-sm">LWD</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -182,10 +182,10 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
                                             }}
                                         />
                                         <div className="min-w-0 text-left">
-                                            <div className="text-[11px] font-bold text-gray-900 truncate max-w-[140px]" title={emp.fullName}>
+                                            <div className="text-[11px] font-bold text-title truncate max-w-[140px]" title={emp.fullName}>
                                                 {emp.fullName}
                                             </div>
-                                            <div className="text-[10px] text-gray-500 truncate max-w-[140px]" title={emp.jobTitle}>
+                                            <div className="text-[10px] text-muted truncate max-w-[140px]" title={emp.jobTitle}>
                                                 {emp.jobTitle}
                                             </div>
                                         </div>
@@ -194,7 +194,7 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
 
                                 {/* Dept Column */}
                                 <td className="py-2.5 px-2 align-middle hidden sm:table-cell text-center">
-                                    <div className="text-[10px] font-medium text-gray-600 truncate max-w-[120px] mx-auto" title={emp.dept}>
+                                    <div className="text-[10px] font-medium text-body truncate max-w-[120px] mx-auto" title={emp.dept}>
                                         {emp.dept}
                                     </div>
                                 </td>
@@ -220,8 +220,8 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
 
             {/* Footer - Pagination */}
             {resigningEmployees.length > 0 && (
-                <div className="shrink-0 px-3 py-2 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <span className="text-[10px] text-[#64748B] font-medium">
+                <div className="shrink-0 px-3 py-2 border-t border-gray-100 dark:border-[var(--color-border-light)] flex items-center justify-between bg-gray-50/50 dark:bg-[var(--color-bg-card)]">
+                    <span className="text-[10px] text-muted font-medium">
                         showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, resigningEmployees.length)} of {resigningEmployees.length}
                     </span>
 

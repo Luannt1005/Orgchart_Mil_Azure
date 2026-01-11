@@ -147,25 +147,25 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
             {/* Table Body - Scrollable */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 <table className="w-full">
-                    <thead className="border-b border-gray-200 sticky top-0 z-10">
+                    <thead className="border-b border-gray-200 dark:border-[var(--color-border-light)] sticky top-0 z-10 bg-white dark:bg-[var(--color-bg-card)]">
                         <tr className="[&>th]:p-2!">
-                            <th className="px-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <th className="px-3 text-left text-[10px] font-semibold text-muted uppercase tracking-wider">
                                 Name
                             </th>
-                            <th className="px-2 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <th className="px-2 text-center text-[10px] font-semibold text-muted uppercase tracking-wider">
                                 Dept
                             </th>
-                            <th className="px-2 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <th className="px-2 text-center text-[10px] font-semibold text-muted uppercase tracking-wider">
                                 Title
                             </th>
-                            <th className="px-2 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <th className="px-2 text-center text-[10px] font-semibold text-muted uppercase tracking-wider">
                                 Tenure
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-gray-50 dark:divide-[var(--color-border-light)]">
                         {currentEmployees.map((emp, index) => (
-                            <tr key={emp.empId || index} className="hover:bg-gray-50 transition-colors [&>td]:p-2!">
+                            <tr key={emp.empId || index} className="hover:bg-gray-50 dark:hover:bg-blue-900/10 transition-colors [&>td]:p-2!">
                                 {/* Name + Avatar */}
                                 <td className="px-3">
                                     <div className="flex items-center gap-2">
@@ -182,10 +182,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
                                             }}
                                         />
                                         <div className="min-w-0">
-                                            <div className="text-xs font-semibold text-[#0F172A] truncate max-w-[120px]">
+                                            <div className="text-xs font-semibold text-title truncate max-w-[120px]">
                                                 {emp.fullName}
                                             </div>
-                                            <div className="text-[9px] text-[#94A3B8]">
+                                            <div className="text-[9px] text-muted">
                                                 {emp.empId}
                                             </div>
                                         </div>
@@ -194,14 +194,14 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
 
                                 {/* Department */}
                                 <td className="px-2 text-center">
-                                    <span className="text-[10px] text-[#334155] truncate block max-w-[80px] mx-auto">
+                                    <span className="text-[10px] text-body truncate block max-w-[80px] mx-auto">
                                         {emp.dept}
                                     </span>
                                 </td>
 
                                 {/* Title */}
                                 <td className="px-2 text-center">
-                                    <span className="text-[10px] text-[#334155] truncate block max-w-[100px] mx-auto">
+                                    <span className="text-[10px] text-body truncate block max-w-[100px] mx-auto">
                                         {emp.title}
                                     </span>
                                 </td>
@@ -223,25 +223,25 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ className, filter, nodes,
 
             {/* Pagination - Compact */}
             {totalPages > 1 && (
-                <div className="shrink-0 px-3 py-2 border-t border-gray-100 flex items-center justify-between bg-white">
-                    <span className="text-[10px] text-gray-500">
+                <div className="shrink-0 px-3 py-2 border-t border-gray-100 dark:border-[var(--color-border-light)] flex items-center justify-between bg-white dark:bg-[var(--color-bg-card)]">
+                    <span className="text-[10px] text-muted">
                         {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, employees.length)} of {employees.length}
                     </span>
                     <div className="flex gap-1">
                         <button
                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             disabled={currentPage === 1}
-                            className="px-2 py-1 text-[10px] font-medium rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="px-2 py-1 text-[10px] font-medium rounded bg-gray-100 dark:bg-[#1E293B] dark:border dark:border-[var(--color-border-light)] text-muted hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                             Prev
                         </button>
-                        <span className="px-2 py-1 text-[10px] font-medium text-gray-500">
+                        <span className="px-2 py-1 text-[10px] font-medium text-muted">
                             {currentPage}/{totalPages}
                         </span>
                         <button
                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentPage === totalPages}
-                            className="px-2 py-1 text-[10px] font-medium rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="px-2 py-1 text-[10px] font-medium rounded bg-gray-100 dark:bg-[#1E293B] dark:border dark:border-[var(--color-border-light)] text-muted hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                             Next
                         </button>

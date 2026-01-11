@@ -85,20 +85,20 @@ export default function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-40 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none border-b border-gray-200 shadow-md">
+        <header className="sticky top-0 z-40 flex w-full bg-card drop-shadow-1 border-b border-[var(--color-border)] shadow-md">
             <div className="h-15 flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
                 {/* Search Bar */}
                 <div className="hidden sm:block">
                     <form action="#" method="POST">
                         <div className="relative">
                             <button className="absolute left-0 top-1/2 -translate-y-1/2">
-                                <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 hover:text-primary transition-colors" />
+                                <MagnifyingGlassIcon className="w-5 h-5 text-muted hover:text-primary transition-colors" />
                             </button>
 
                             <input
                                 type="text"
                                 placeholder="Type to search..."
-                                className="w-full bg-transparent pl-9 pr-4 text-black focus:outline-none dark:text-white xl:w-125 font-medium placeholder-gray-400"
+                                className="w-full bg-transparent pl-9 pr-4 text-body focus:outline-none xl:w-125 font-medium placeholder-gray-400"
                             />
                         </div>
                     </form>
@@ -111,23 +111,23 @@ export default function Header() {
                         <li>
                             <button
                                 onClick={toggleDarkMode}
-                                className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray-100 hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white transition-all hover:bg-gray-200"
+                                className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-[var(--color-border)] bg-[var(--color-bg-page)] hover:text-primary transition-all hover:bg-[var(--color-border-light)]"
                             >
                                 {isDarkMode ? (
                                     <SunIcon className="w-5 h-5 text-yellow-500" />
                                 ) : (
-                                    <MoonIcon className="w-5 h-5 text-gray-600" />
+                                    <MoonIcon className="w-5 h-5 text-muted" />
                                 )}
                             </button>
                         </li>
 
                         {/* Notification Bell */}
                         <li>
-                            <button className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray-100 hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white transition-all hover:bg-gray-200">
+                            <button className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-[var(--color-border)] bg-[var(--color-bg-page)] hover:text-primary transition-all hover:bg-[var(--color-border-light)]">
                                 <span className="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-600 animate-pulse">
                                     <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
                                 </span>
-                                <BellIcon className="w-5 h-5 text-gray-600" />
+                                <BellIcon className="w-5 h-5 text-muted" />
                             </button>
                         </li>
                     </ul>
@@ -139,31 +139,31 @@ export default function Header() {
                             className="flex items-center gap-4"
                         >
                             <span className="hidden text-right lg:block">
-                                <span className="block text-sm font-medium text-black dark:text-white">
+                                <span className="block text-sm font-medium text-title">
                                     {user?.full_name || 'Loading...'}
                                 </span>
-                                <span className="block text-xs font-medium text-gray-500">
+                                <span className="block text-xs font-medium text-muted">
                                     {user?.role || 'User'}
                                 </span>
                             </span>
 
-                            <span className="h-10 w-10 rounded-full overflow-hidden bg-gray-200 border border-gray-300">
-                                <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold text-lg bg-gray-100">
+                            <span className="h-10 w-10 rounded-full overflow-hidden bg-[var(--color-bg-page)] border border-[var(--color-border)]">
+                                <div className="w-full h-full flex items-center justify-center text-muted font-bold text-lg bg-[var(--color-bg-page)]">
                                     {user?.full_name?.charAt(0).toUpperCase() || <UserCircleIcon className="w-8 h-8" />}
                                 </div>
                             </span>
 
-                            <ChevronDownIcon className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                            <ChevronDownIcon className={`w-4 h-4 text-muted transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
 
                         {/* Dropdown Start */}
                         {isDropdownOpen && (
-                            <div className="absolute right-0 mt-4 w-48 rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
-                                <ul className="flex flex-col gap-1 border-b border-stroke py-2 dark:border-strokedark">
+                            <div className="absolute right-0 mt-4 w-48 rounded-md border border-[var(--color-border)] bg-card shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                                <ul className="flex flex-col gap-1 border-b border-[var(--color-border)] py-2">
                                     <li>
                                         <Link
                                             href="/profile"
-                                            className="flex items-center gap-3.5 px-6 py-2 text-sm font-medium duration-300 ease-in-out hover:text-primary hover:bg-gray-50 lg:text-base text-gray-700"
+                                            className="flex items-center gap-3.5 px-6 py-2 text-sm font-medium duration-300 ease-in-out hover:text-primary hover:bg-[var(--color-bg-page)] lg:text-base text-body"
                                         >
                                             <UserCircleIcon className="w-5 h-5" />
                                             My Profile
@@ -172,7 +172,7 @@ export default function Header() {
                                 </ul>
                                 <button
                                     onClick={handleLogout}
-                                    className="flex w-full items-center gap-3.5 px-6 py-3 text-sm font-medium duration-300 ease-in-out hover:text-primary hover:bg-gray-50 lg:text-base text-red-600 hover:text-red-700"
+                                    className="flex w-full items-center gap-3.5 px-6 py-3 text-sm font-medium duration-300 ease-in-out hover:text-primary hover:bg-[var(--color-bg-page)] lg:text-base text-red-600 hover:text-red-700"
                                 >
                                     <ArrowLeftOnRectangleIcon className="w-5 h-5" />
                                     Log Out
