@@ -24,13 +24,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
 /**
  * Browser/Client-side Supabase client
  * Uses anon key - respects Row Level Security (RLS)
+ * Implements singleton pattern to prevent multiple instances during development
  */
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+const createBrowserClient = () => createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         persistSession: true,
         autoRefreshToken: true,
     },
 });
+
+// Use global variable to store client in development to prevent multiple instances on HMR
+const globalForSupabase = global as unknown as { supabase: SupabaseClient };
+
+export const supabase = globalForSupabase.supabase || createBrowserClient();
+
+if (process.env.NODE_ENV !== 'production') {
+    globalForSupabase.supabase = supabase;
+}
 
 /**
  * Server-side Supabase client (for API routes)

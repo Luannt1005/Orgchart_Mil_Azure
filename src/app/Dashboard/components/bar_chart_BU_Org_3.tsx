@@ -70,7 +70,7 @@ const BUOrg3Chart: React.FC<BUOrg3ChartProps> = ({ className, nodes, loading = f
             </div>
 
             {/* Chart */}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={chartData}

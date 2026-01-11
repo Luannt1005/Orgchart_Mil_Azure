@@ -87,7 +87,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ className, onFilterChange, node
                 <h3 className="text-[13px] pl-1 font-bold text-title">Employee Type</h3>
             </div>
 
-            <div className="flex-1 min-h-0 relative">
+            <div className="flex-1 min-h-[300px] relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <defs>

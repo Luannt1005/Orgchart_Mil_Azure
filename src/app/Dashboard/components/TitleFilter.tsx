@@ -67,12 +67,12 @@ const TitleFilter: React.FC<TitleFilterProps> = ({ nodes, onSelect, selectedTitl
             <button
                 className={`
                     w-48 py-1.5 px-3 text-xs font-medium text-left
-                    bg-[var(--color-bg-card)] border rounded-lg flex items-center justify-between
+                    bg-(--color-bg-card) border rounded-lg flex items-center justify-between
                     focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
                     transition-all duration-200
                     ${selectedTitle
                         ? 'border-blue-300 bg-blue-50 text-blue-700'
-                        : 'border-[var(--color-border-light)] text-body hover:border-gray-300'
+                        : 'border-(--color-border-light) text-body hover:border-gray-300'
                     }
                 `}
                 onClick={() => setIsOpen(!isOpen)}
@@ -99,14 +99,14 @@ const TitleFilter: React.FC<TitleFilterProps> = ({ nodes, onSelect, selectedTitl
             </button>
 
             {isOpen && (
-                <div className="absolute z-50 w-48 mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border-light)] rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                <div className="absolute z-50 w-48 mt-1 bg-(--color-bg-card) border border-(--color-border-light) rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
                     {availableCategories.length === 0 ? (
                         <div className="px-3 py-2 text-xs text-muted">No available roles</div>
                     ) : (
                         availableCategories.map((cat) => (
                             <button
                                 key={cat.value}
-                                className={`w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between transition-colors border-b border-[var(--color-border-light)] last:border-0 text-xs font-medium ${selectedTitle === cat.value ? 'bg-blue-50 text-blue-700' : 'text-body'
+                                className={`w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between transition-colors border-b border-(--color-border-light) last:border-0 text-xs font-medium ${selectedTitle === cat.value ? 'bg-blue-50 text-blue-700' : 'text-body'
                                     }`}
                                 onClick={() => handleSelect(cat)}
                             >
