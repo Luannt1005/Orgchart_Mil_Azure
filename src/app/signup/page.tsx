@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./signup.module.css";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 // Supabase client
 import { supabase } from "@/lib/supabase";
@@ -13,45 +12,21 @@ import { hashPassword } from "@/lib/password";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const router = useRouter();
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    // Auto-complete domain when typing '@'
-    if (value.endsWith('@') && !value.includes('@ttigroup.com.vn')) {
-      const parts = value.split('@');
-      // Only append if we just typed the @ symbol (checks if there is exactly one @ and it's at the end)
-      if (parts.length === 2 && parts[1] === '') {
-        value = parts[0] + '@ttigroup.com.vn';
-      }
-    }
-
-    setEmail(value);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     // Validation
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (!fullName || !username || !password || !confirmPassword) {
       setError("Vui lòng nhập đầy đủ thông tin");
-      return;
-    }
-
-    if (!email.endsWith("@ttigroup.com.vn")) {
-      setError("Email không hợp lệ");
       return;
     }
 
@@ -68,11 +43,11 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // 1. Check if email (username) already exists in Supabase
+      // 1. Check if username already exists in Supabase
       const { data: existingUsers, error: queryError } = await supabase
         .from('users')
         .select('username')
-        .eq('username', email)
+        .eq('username', username)
         .limit(1);
 
       if (queryError) {
@@ -81,7 +56,7 @@ export default function SignupPage() {
       }
 
       if (existingUsers && existingUsers.length > 0) {
-        setError("Email này đã được đăng ký");
+        setError("Tên đăng nhập đã tồn tại");
         setLoading(false);
         return;
       }
@@ -93,7 +68,7 @@ export default function SignupPage() {
       const { error: insertError } = await supabase
         .from('users')
         .insert({
-          username: email, // Use email as username
+          username,
           password: hashedPassword,
           full_name: fullName,
           role: 'user'
@@ -151,12 +126,14 @@ export default function SignupPage() {
         {/* Logo */}
         <div className={styles['signup-logo']}>
           <div className={styles['logo-wrapper']}>
-            <img
+            <Image
               src="/Milwaukee-logo-red.png"
-              alt="Milwaukee Tool"
               width={200}
               height={90}
+              alt="Milwaukee Tool"
               style={{ objectFit: 'contain' }}
+              priority
+              unoptimized
             />
           </div>
         </div>
@@ -195,21 +172,21 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Email */}
+          {/* Username */}
           <div className={styles['form-group']}>
-            <label htmlFor="email">Email</label>
+            <label htmlFor="username">Tên đăng nhập</label>
             <div className={styles['input-wrapper']}>
               <input
-                id="email"
-                type="text" // using text to allow typing @
-                placeholder="Nhập email công ty"
-                value={email}
-                onChange={handleEmailChange}
+                id="username"
+                type="text"
+                placeholder="Nhập tên đăng nhập"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
                 className={styles['form-input']}
                 required
               />
-              <span className={styles['input-icon']}>✉️</span>
+              <span className={styles['input-icon']}>👤</span>
             </div>
           </div>
 
@@ -219,7 +196,7 @@ export default function SignupPage() {
             <div className={styles['input-wrapper']}>
               <input
                 id="password"
-                type={showPassword ? "text" : "password"}
+                type="password"
                 placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -227,18 +204,7 @@ export default function SignupPage() {
                 className={styles['form-input']}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className={styles['input-icon']}
-                style={{ pointerEvents: 'auto', border: 'none', background: 'transparent', cursor: 'pointer' }}
-              >
-                {showPassword ? (
-                  <EyeSlashIcon className="w-5 h-5 text-gray-500" />
-                ) : (
-                  <EyeIcon className="w-5 h-5 text-gray-500" />
-                )}
-              </button>
+              <span className={styles['input-icon']}>🔒</span>
             </div>
           </div>
 
@@ -248,7 +214,7 @@ export default function SignupPage() {
             <div className={styles['input-wrapper']}>
               <input
                 id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
+                type="password"
                 placeholder="Nhập lại mật khẩu"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -256,18 +222,7 @@ export default function SignupPage() {
                 className={styles['form-input']}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className={styles['input-icon']}
-                style={{ pointerEvents: 'auto', border: 'none', background: 'transparent', cursor: 'pointer' }}
-              >
-                {showConfirmPassword ? (
-                  <EyeSlashIcon className="w-5 h-5 text-gray-500" />
-                ) : (
-                  <EyeIcon className="w-5 h-5 text-gray-500" />
-                )}
-              </button>
+              <span className={styles['input-icon']}>🔒</span>
             </div>
           </div>
 
