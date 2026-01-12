@@ -172,6 +172,32 @@ export function patchOrgChartTemplates() {
 
 
 
+  // --- TEMPLATE BIG Budget Headcount (Milwaukee Industrial Edition) ---
+  OrgChart.templates.big_budget_headcount = Object.assign({}, OrgChart.templates.big);
+
+  OrgChart.templates.big_budget_headcount.node = `
+<rect x="0" y="50" height="330" width="230"
+      fill="#82A762"
+      stroke="#E5E7EB"
+      stroke-width="1"
+      rx="0" ry="0"
+      filter="url(#mil-shadow)"></rect>
+
+<rect x="0" y="50" height="10" width="230"
+      fill="#DB011C"
+      rx="0" ry="0"></rect>
+`;
+
+  OrgChart.templates.big_budget_headcount.field_0 = `
+<image
+    x="{cw-25}"
+    y="10"
+    width="50"
+    height="50"
+    href="/headcount_budget.png"
+/>
+`;
+
 
 
   // --- TEMPLATE BIG Inderct report group (Milwaukee Industrial Edition) ---
