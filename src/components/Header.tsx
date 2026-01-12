@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/context/UserContext";
 import {
-    MagnifyingGlassIcon,
-    BellIcon,
     SunIcon,
     MoonIcon,
     ArrowLeftOnRectangleIcon,
@@ -75,50 +73,40 @@ export default function Header() {
 
     return (
         <header className="sticky top-0 z-40 flex w-full bg-[var(--color-bg-card)] drop-shadow-1 border-b border-[var(--color-border)] shadow-md">
-            <div className="h-15 flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
+            <div className="h-15 flex flex-grow items-center justify-end px-4 py-4 shadow-2 md:px-6 2xl:px-11">
                 {/* Search Bar */}
-                <div className="hidden sm:block">
-                    <form action="#" method="POST">
-                        <div className="relative">
-                            <button className="absolute left-0 top-1/2 -translate-y-1/2">
-                                <MagnifyingGlassIcon className="w-5 h-5 text-muted hover:text-primary transition-colors" />
-                            </button>
-
-                            <input
-                                type="text"
-                                placeholder="Type to search..."
-                                className="w-full bg-transparent pl-9 pr-4 text-body focus:outline-none xl:w-125 font-medium placeholder-gray-400"
-                            />
-                        </div>
-                    </form>
-                </div>
-
                 {/* Right Side */}
                 <div className="flex items-center gap-3 2xsm:gap-7">
                     <ul className="flex items-center gap-2 2xsm:gap-4">
                         {/* Dark Mode Toggle */}
                         <li>
-                            <button
-                                onClick={toggleDarkMode}
-                                className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-[var(--color-border)] bg-[var(--color-bg-page)] hover:text-primary transition-all hover:bg-[var(--color-border-light)]"
-                            >
-                                {isDarkMode ? (
-                                    <SunIcon className="w-5 h-5 text-yellow-500" />
-                                ) : (
-                                    <MoonIcon className="w-5 h-5 text-muted" />
-                                )}
-                            </button>
+                            <label className={`
+                                relative m-0 block h-7.5 w-14 rounded-full cursor-pointer transition-colors duration-300 ease-in-out
+                                ${isDarkMode ? 'bg-blue-600' : 'bg-gray-200'}
+                            `}>
+                                <input
+                                    type="checkbox"
+                                    onChange={toggleDarkMode}
+                                    className="absolute m-0 h-0 w-0 opacity-0 z-0"
+                                    checked={isDarkMode}
+                                />
+                                <span
+                                    className={`
+                                        absolute top-1/2 left-[3px] flex h-6 w-6 -translate-y-1/2 translate-x-0 items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-300 ease-in-out
+                                        ${isDarkMode && 'translate-x-[26px]'}
+                                    `}
+                                >
+                                    {isDarkMode ? (
+                                        <MoonIcon className="h-4 w-4 text-gray-400" />
+                                    ) : (
+                                        <SunIcon className="h-4 w-4 text-yellow-500" />
+                                    )}
+                                </span>
+                            </label>
                         </li>
 
                         {/* Notification Bell */}
-                        <li>
-                            <button className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-[var(--color-border)] bg-[var(--color-bg-page)] hover:text-primary transition-all hover:bg-[var(--color-border-light)]">
-                                <span className="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-600 animate-pulse">
-                                    <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
-                                </span>
-                                <BellIcon className="w-5 h-5 text-muted" />
-                            </button>
-                        </li>
+
                     </ul>
 
                     {/* User Area */}

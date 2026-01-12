@@ -77,7 +77,7 @@ export default function DepartmentFilter({
     const selectedTypeCount = currentType === 'all' ? 0 : currentType.split(',').length;
 
     return (
-        <div className="w-full bg-white/80 backdrop-blur-md border-b border-gray-200 border-radius-2xl top-0 z-50">
+        <div className="w-full bg-[var(--color-bg-card)]/95 backdrop-blur-md border-b border-[var(--color-border-light)] top-0 z-50">
             <div className="px-4 py-2">
                 <div className="relative w-full" ref={dropdownRef}>
                     <div className="space-y-1">
@@ -92,14 +92,14 @@ export default function DepartmentFilter({
                             <div className="relative flex-1 min-w-[200px] max-w-sm">
                                 <button
                                     onClick={() => setActiveDropdown(activeDropdown === 'dept' ? null : 'dept')}
-                                    className={`flex items-center justify-between w-full px-3 py-2 bg-gray-50 border transition-all duration-200 group rounded-lg ${activeDropdown === 'dept'
-                                        ? 'border-[#DB011C] bg-white ring-2 ring-[#DB011C]/5'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-100/50'
+                                    className={`flex items-center justify-between w-full px-3 py-2 bg-[var(--color-bg-page)] border transition-all duration-200 group rounded-lg ${activeDropdown === 'dept'
+                                        ? 'border-[#DB011C] bg-[var(--color-bg-card)] ring-2 ring-[#DB011C]/5'
+                                        : 'border-[var(--color-border-light)] hover:border-[var(--color-border)] hover:bg-[var(--color-bg-card)]'
                                         }`}
                                 >
                                     <div className="flex items-center gap-2 truncate overflow-hidden">
                                         <div className={`w-1.5 h-1.5 rounded-full ${currentSector === "all" ? 'bg-gray-400' : 'bg-[#DB011C]'}`}></div>
-                                        <span className="text-sm font-bold text-gray-900 tracking-tight truncate">
+                                        <span className={`text-sm font-bold tracking-tight truncate ${currentSector === "all" ? 'text-[var(--color-text-title)]' : 'text-[var(--color-text-title)]'}`}>
                                             {currentSector === "all" ? "All Departments" : currentSector}
                                         </span>
                                     </div>
@@ -109,24 +109,24 @@ export default function DepartmentFilter({
                                 </button>
 
                                 {activeDropdown === 'dept' && (
-                                    <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-                                        <div className="p-2 bg-white border-b border-gray-100">
+                                    <div className="absolute top-full left-0 mt-1 w-full bg-[var(--color-bg-card)] border border-[var(--color-border-light)] rounded-xl shadow-lg z-50 overflow-hidden">
+                                        <div className="p-2 bg-[var(--color-bg-card)] border-b border-[var(--color-border-light)]">
                                             <input
                                                 type="text"
                                                 placeholder="Search..."
                                                 value={sectorQuery}
                                                 onChange={(e) => setSectorQuery(e.target.value)}
                                                 autoFocus
-                                                className="w-full bg-gray-50 border border-gray-200 px-3 py-1.5 text-xs text-gray-900 rounded-md focus:outline-none focus:border-[#DB011C] focus:bg-white placeholder:text-gray-400"
+                                                className="w-full bg-[var(--color-bg-page)] border border-[var(--color-border-light)] px-3 py-1.5 text-xs text-[var(--color-text-body)] rounded-md focus:outline-none focus:border-[#DB011C] focus:bg-[var(--color-bg-card)] placeholder:text-[var(--color-text-muted)]"
                                             />
                                         </div>
                                         <div className="max-h-[50vh] overflow-y-auto custom-scrollbar">
-                                            <button onClick={() => handleSelect("all")} className={`w-full px-4 py-2 text-left text-xs font-semibold flex justify-between ${currentSector === "all" ? "bg-red-50 text-[#DB011C]" : "text-gray-600 hover:bg-gray-50"}`}>
+                                            <button onClick={() => handleSelect("all")} className={`w-full px-4 py-2 text-left text-xs font-semibold flex justify-between ${currentSector === "all" ? "bg-red-50 text-[#DB011C]" : "text-[var(--color-text-body)] hover:bg-[var(--color-bg-page)]"}`}>
                                                 <span>All Departments</span>
                                                 {currentSector === "all" && <div className="w-1.5 h-1.5 rounded-full bg-[#DB011C]"></div>}
                                             </button>
                                             {filteredSectors.map((sector) => (
-                                                <button key={sector} onClick={() => handleSelect(sector)} className={`w-full px-4 py-2 text-left text-xs font-semibold flex justify-between border-t border-gray-50/50 ${currentSector === sector ? "bg-red-50 text-[#DB011C]" : "text-gray-600 hover:bg-gray-50"}`}>
+                                                <button key={sector} onClick={() => handleSelect(sector)} className={`w-full px-4 py-2 text-left text-xs font-semibold flex justify-between border-t border-[var(--color-border-light)] ${currentSector === sector ? "bg-red-50 text-[#DB011C]" : "text-[var(--color-text-body)] hover:bg-[var(--color-bg-page)]"}`}>
                                                     <span className="truncate pr-4">{sector}</span>
                                                     {currentSector === sector && <div className="w-1.5 h-1.5 rounded-full bg-[#DB011C]"></div>}
                                                 </button>
@@ -140,12 +140,12 @@ export default function DepartmentFilter({
                             <div className="relative w-40">
                                 <button
                                     onClick={() => setActiveDropdown(activeDropdown === 'type' ? null : 'type')}
-                                    className={`flex items-center justify-between w-full px-3 py-2 bg-gray-50 border transition-all duration-200 group rounded-lg ${activeDropdown === 'type'
-                                        ? 'border-[#DB011C] bg-white ring-2 ring-[#DB011C]/5'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-100/50'
+                                    className={`flex items-center justify-between w-full px-3 py-2 bg-[var(--color-bg-page)] border transition-all duration-200 group rounded-lg ${activeDropdown === 'type'
+                                        ? 'border-[#DB011C] bg-[var(--color-bg-card)] ring-2 ring-[#DB011C]/5'
+                                        : 'border-[var(--color-border-light)] hover:border-[var(--color-border)] hover:bg-[var(--color-bg-card)]'
                                         }`}
                                 >
-                                    <span className="text-sm font-bold text-gray-900 tracking-tight truncate">
+                                    <span className="text-sm font-bold text-[var(--color-text-title)] tracking-tight truncate">
                                         {currentType === "all"
                                             ? "All Types"
                                             : selectedTypeCount > 1
@@ -158,18 +158,18 @@ export default function DepartmentFilter({
                                 </button>
 
                                 {activeDropdown === 'type' && (
-                                    <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                                    <div className="absolute top-full left-0 mt-1 w-full bg-[var(--color-bg-card)] border border-[var(--color-border-light)] rounded-xl shadow-lg z-50 overflow-hidden">
                                         <div className="max-h-[50vh] overflow-y-auto custom-scrollbar">
-                                            <button onClick={() => handleTypeToggle("all")} className={`w-full px-4 py-2 text-left text-xs font-semibold flex items-center justify-between ${currentType === "all" ? "bg-red-50 text-[#DB011C]" : "text-gray-600 hover:bg-gray-50"}`}>
+                                            <button onClick={() => handleTypeToggle("all")} className={`w-full px-4 py-2 text-left text-xs font-semibold flex items-center justify-between ${currentType === "all" ? "bg-red-50 text-[#DB011C]" : "text-[var(--color-text-body)] hover:bg-[var(--color-bg-page)]"}`}>
                                                 <span>All Types</span>
                                                 {currentType === "all" && <div className="w-1.5 h-1.5 rounded-full bg-[#DB011C]"></div>}
                                             </button>
                                             {typeOptions.map((type) => {
                                                 const isSelected = currentType.split(',').includes(type);
                                                 return (
-                                                    <button key={type} onClick={() => handleTypeToggle(type)} className={`w-full px-4 py-2 text-left text-xs font-semibold flex items-center justify-between border-t border-gray-50/50 ${isSelected ? "bg-red-50 text-[#DB011C]" : "text-gray-600 hover:bg-gray-50"}`}>
+                                                    <button key={type} onClick={() => handleTypeToggle(type)} className={`w-full px-4 py-2 text-left text-xs font-semibold flex items-center justify-between border-t border-[var(--color-border-light)] ${isSelected ? "bg-red-50 text-[#DB011C]" : "text-[var(--color-text-body)] hover:bg-[var(--color-bg-page)]"}`}>
                                                         <span>{type}</span>
-                                                        <div className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${isSelected ? 'bg-[#DB011C] border-[#DB011C]' : 'border-gray-300'}`}>
+                                                        <div className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${isSelected ? 'bg-[#DB011C] border-[#DB011C]' : 'border-[var(--color-border)]'}`}>
                                                             {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                                                         </div>
                                                     </button>

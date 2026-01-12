@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-[var(--color-bg-page)]`}
         suppressHydrationWarning
       >
         <UserProvider>
@@ -38,7 +38,7 @@ export default function RootLayout({
             <Sidebar />
             <div className="flex-1 flex flex-col min-w-0 h-full">
               <Header />
-              <main className="flex-1 overflow-auto bg-gray-200 relative p-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+              <main className="flex-1 overflow-auto bg-[var(--color-bg-page)] relative p-4 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent transition-colors duration-300">
                 <PageTransition>
                   {children}
                 </PageTransition>
