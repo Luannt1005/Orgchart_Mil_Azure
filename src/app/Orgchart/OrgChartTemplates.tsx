@@ -174,6 +174,24 @@ export function patchOrgChartTemplates() {
 
 
 
+  // --- TEMPLATE BIG Probation (Milwaukee Industrial Edition) ---
+  OrgChart.templates.big_hc_open = Object.assign({}, OrgChart.templates.big);
+
+  OrgChart.templates.big_hc_open.node = `
+<rect x="0" y="50" height="330" width="230"
+      fill="gray"
+      stroke="#E5E7EB"
+      stroke-width="1"
+      rx="0" ry="0"
+      filter="url(#mil-shadow)"></rect>
+
+<rect x="0" y="50" height="10" width="230"
+      fill="#DB011C"
+      rx="0" ry="0"></rect>
+`;
+
+
+
   // --- TEMPLATE BIG Inderct report group (Milwaukee Industrial Edition) ---
   OrgChart.templates.indirect_group = Object.assign({}, OrgChart.templates.group);
 
@@ -185,6 +203,8 @@ export function patchOrgChartTemplates() {
   OrgChart.templates.indirect_group.link =
     '<path stroke-linejoin="round" stroke="#1e90ff" stroke-width="4px" stroke-dasharray="10" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
 }
+
+
 
 
 

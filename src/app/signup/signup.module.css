@@ -528,3 +528,47 @@
     font-size: 14px;
   }
 }
+.input-button {
+  position: absolute;
+  right: 14px;
+  font-size: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: #666;
+  z-index: 10;
+  transition: opacity 0.2s;
+}
+.input-button:hover {
+  opacity: 1;
+  color: #333;
+}
+.email-suggestion {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid var(--mwk-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 20;
+  padding: 10px;
+  margin-top: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--mwk-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+.email-suggestion:hover {
+  background-color: var(--mwk-light);
+  border-color: var(--mwk-border);
+}

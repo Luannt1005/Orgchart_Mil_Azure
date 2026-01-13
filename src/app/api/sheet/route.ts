@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedData, invalidateCachePrefix } from "@/lib/cache";
 import { syncSingleEmployee } from "@/lib/orgchart-sync";
+import { retryOperation } from "@/lib/retry";
 
 // Cache TTL: 15 minutes for employee list
 const EMPLOYEES_CACHE_TTL = 15 * 60 * 1000;
@@ -128,9 +129,18 @@ export async function GET(req: Request) {
         }
       });
 
-      const { data: employees, error: dataError } = await dataQuery
-        .range(from, to)
-        .order('full_name', { ascending: true });
+      const { data: employees, error: dataError } = await retryOperation(
+        async () => {
+          const result = await dataQuery
+            .range(from, to)
+            .order('full_name', { ascending: true });
+
+          if (result.error) throw result.error;
+          return result;
+        },
+        3, // 3 retries
+        1000 // 1 second initial delay
+      );
 
       if (dataError) {
         console.error("Data query error:", dataError);
@@ -255,6 +265,56 @@ export async function POST(req: Request) {
         { success: false, error: "Missing action or data" },
         { status: 400 }
       );
+    }
+
+    if (action === "bulkAddHeadcount") {
+      const { quantity, data } = body;
+
+      if (!quantity || typeof quantity !== 'number' || quantity <= 0) {
+        return NextResponse.json(
+          { success: false, error: "Invalid quantity" },
+          { status: 400 }
+        );
+      }
+
+      const timestamp = Date.now();
+      const newEmployees = [];
+
+      for (let i = 0; i < quantity; i++) {
+        // Generate unique ID: HC-TIMESTAMP-INDEX
+        const empId = `HC-${timestamp}-${i + 1}`;
+
+        newEmployees.push({
+          emp_id: empId,
+          full_name: data["FullName "] || data["FullName"] || "Vacant Position",
+          job_title: data["Job Title"] || null,
+          dept: data["Dept"] || null,
+          bu: data["BU"] || null,
+          bu_org_3: data["BU Org 3"] || null,
+          dl_idl_staff: data["DL/IDL/Staff"] || null,
+          location: data["Location"] || null,
+          employee_type: 'hc_open', // Force hc_open
+          line_manager: data["Line Manager"] || null,
+          is_direct: data["Is Direct"] || "YES",
+          joining_date: data["Joining\r\n Date"] || data["Joining Date"] || null,
+          last_working_day: data["Last Working\r\nDay"] || data["Last Working Day"] || null
+        });
+      }
+
+      const { data: inserted, error } = await supabaseAdmin
+        .from('employees')
+        .insert(newEmployees)
+        .select('id');
+
+      if (error) throw error;
+
+      invalidateCachePrefix('employees');
+
+      return NextResponse.json({
+        success: true,
+        count: inserted ? inserted.length : 0,
+        message: `Successfully added ${inserted ? inserted.length : 0} open headcount positions`
+      });
     }
 
     if (action === "add") {

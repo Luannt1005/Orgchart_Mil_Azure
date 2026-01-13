@@ -2,20 +2,88 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedData } from "@/lib/cache";
 
-// Cache TTL: 15 minutes for orgchart data (increased for better performance)
+// Cache TTL: 15 minutes for orgchart data
 const ORGCHART_CACHE_TTL = 15 * 60 * 1000;
+const IMAGE_BASE_URL = "https://raw.githubusercontent.com/Luannt1005/test-images/main/";
 
-// Only select columns needed for orgchart rendering
-const ORGCHART_COLUMNS = 'id, pid, stpid, name, title, image, tags, dept, bu, type, location, joining_date';
+interface Employee {
+  id: string;
+  emp_id: string;
+  full_name: string | null;
+  job_title: string | null;
+  dept: string | null;
+  bu: string | null;
+  bu_org_3: string | null;
+  dl_idl_staff: string | null;
+  location: string | null;
+  employee_type: string | null;
+  is_direct: string | null;
+  line_manager: string | null;
+  joining_date: string | null;
+  last_working_day: string | null;
+  [key: string]: any;
+}
+
+// --- Helper Functions ---
+
+// Trim leading zeros from ID
+const trimLeadingZeros = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  const trimmed = String(value).replace(/^0+/, '') || '0';
+  return trimmed === '0' ? null : trimmed;
+};
+
+// Format date to DD/MM/YYYY
+const formatDate = (value: any): string => {
+  if (!value) return "";
+  try {
+    // Handle Excel serial number
+    if (typeof value === 'number' || (typeof value === 'string' && /^\d+$/.test(value))) {
+      const excelSerial = Number(value);
+      if (excelSerial > 0) {
+        const date = new Date((excelSerial - 1) * 86400000 + new Date(1900, 0, 1).getTime());
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+    }
+    // Handle ISO string
+    if (typeof value === 'string' && value.includes('T')) {
+      const date = new Date(value);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+    // Handle DD/MM/YYYY format
+    if (typeof value === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value)) {
+      return value;
+    }
+    return String(value);
+  } catch (e) {
+    return String(value);
+  }
+};
+
+// Check if employee is in probation period (60 days)
+const isProbationPeriod = (joiningDateStr: string): boolean => {
+  if (!joiningDateStr) return false;
+  try {
+    const [day, month, year] = joiningDateStr.split('/').map(Number);
+    const joiningDate = new Date(year, month - 1, day);
+    const now = new Date();
+    const diffTime = now.getTime() - joiningDate.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 60 && diffDays >= 0;
+  } catch (e) {
+    return false;
+  }
+};
 
 /**
  * GET /api/orgchart
- * Fetch orgchart nodes, optionally filtered by department
- * 
- * OPTIMIZATIONS:
- * 1. Select only needed columns (excludes raw_data, description)
- * 2. Extended cache TTL to 15 minutes
- * 3. Database-side filtering for department
+ * Fetch employees directly and transform to orgchart nodes on-the-fly.
  */
 export async function GET(req: Request) {
   try {
@@ -23,39 +91,126 @@ export async function GET(req: Request) {
     const dept = searchParams.get("dept");
 
     // Build cache key based on department filter
-    const cacheKey = dept && dept !== "all" ? `orgchart_dept_${dept}` : 'orgchart_all';
+    const cacheKey = dept && dept !== "all" ? `orgchart_direct_dept_${dept}` : 'orgchart_direct_all';
 
     const data = await getCachedData(
       cacheKey,
       async () => {
-        console.log(`📡 [Cache MISS] Fetching orgchart from Supabase (dept: ${dept || 'all'})...`);
+        console.log(`📡 [Cache MISS] Fetching employees from Supabase (dept: ${dept || 'all'})...`);
 
+        // 1. Fetch employees
         let query = supabaseAdmin
-          .from('orgchart_nodes')
-          .select(ORGCHART_COLUMNS);
+          .from('employees')
+          .select('*')
+          // Filter out rows without emp_id to maintain data integrity
+          .neq('emp_id', '');
 
-        // Apply database-side filtering for better performance
         if (dept && dept !== "all") {
           query = query.eq('dept', dept);
         }
 
-        const { data: nodes, error } = await query;
+        const { data: employees, error } = await query;
 
         if (error) {
           console.error("Supabase error:", error);
           throw error;
         }
 
-        // Filter out nodes without dept (if fetching all)
-        let validNodes = nodes || [];
-        if (!dept || dept === "all") {
-          validNodes = validNodes.filter(
-            (n: any) => typeof n.dept === "string" && n.dept.trim() !== ""
-          );
+        if (!employees || employees.length === 0) {
+          return [];
         }
 
-        console.log(`✅ Loaded ${validNodes.length} orgchart nodes`);
-        return validNodes;
+        // 2. Transform to Orgchart Nodes
+        const output: any[] = [];
+        const deptMap = new Map();
+
+        employees.forEach((emp: Employee) => {
+          const empId = String(emp.emp_id || "").trim();
+          if (!empId) return;
+
+          // Get manager ID
+          const managerRaw = emp.line_manager;
+          let managerPart = managerRaw ? String(managerRaw).split(":")[0].trim() : null;
+
+          let isIndirectManager = false;
+          let managerId = null;
+          let deptManagerId = null;
+
+          if (managerPart) {
+            // Logic for indirect managers
+            if (emp.is_direct && String(emp.is_direct).toUpperCase() === 'NO') {
+              isIndirectManager = true;
+              managerId = trimLeadingZeros(managerPart);
+              deptManagerId = "i-" + managerId;
+            } else {
+              managerId = trimLeadingZeros(managerPart);
+              deptManagerId = managerId;
+            }
+          }
+
+          const currentDept = emp.dept || "";
+          // Create a unique key for the department node based on dept name + manager
+          const deptKey = `dept:${currentDept}:${deptManagerId}`;
+
+          // Store department info to create department nodes later
+          deptMap.set(deptKey, { dept: currentDept, managerId, isIndirectManager });
+
+          const joiningDate = formatDate(emp.joining_date) || "";
+          const tags = ["emp"];
+          let imageUrl = `${IMAGE_BASE_URL}${empId}.jpg`;
+
+          // Handle Headcount Open
+          if (emp.employee_type === 'hc_open') {
+            tags.push("headcount_open");
+            imageUrl = "/headcount_open.png";
+          }
+
+          if (joiningDate && isProbationPeriod(joiningDate)) {
+            tags.push("Emp_probation");
+          }
+
+          // Create Employee Node
+          output.push({
+            id: empId,
+            pid: managerId,
+            stpid: deptKey,
+            name: emp.full_name || "",
+            title: emp.job_title || "",
+            image: imageUrl,
+            tags: JSON.stringify(tags),
+            orig_pid: managerId,
+            dept: currentDept || null,
+            bu: emp.bu || null,
+            type: emp.dl_idl_staff || null,
+            location: emp.location || null,
+            description: emp.employee_type || "",
+            joining_date: joiningDate
+          });
+        });
+
+        // 3. Add Department Nodes
+        deptMap.forEach((v, deptKey) => {
+          const deptTags = v.isIndirectManager ? ["indirect_group"] : ["group"];
+          output.push({
+            id: deptKey,
+            pid: v.managerId,
+            stpid: null,
+            name: v.dept || "",
+            title: "Department",
+            image: null,
+            tags: JSON.stringify(deptTags),
+            orig_pid: v.managerId,
+            dept: v.dept || "",
+            bu: null,
+            type: "group",
+            location: null,
+            description: `Dept under manager ${v.managerId}`,
+            joining_date: null
+          });
+        });
+
+        console.log(`✅ Transformed ${employees.length} employees into ${output.length} nodes`);
+        return output;
       },
       ORGCHART_CACHE_TTL
     );
@@ -70,7 +225,7 @@ export async function GET(req: Request) {
       { status: 200 }
     );
 
-    // Extended cache headers
+    // Cache headers
     response.headers.set(
       "Cache-Control",
       "public, s-maxage=300, stale-while-revalidate=600"

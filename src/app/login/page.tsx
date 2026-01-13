@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./login.module.css";
+import { EyeIcon, EyeSlashIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 // Supabase client
 import { supabase } from "@/lib/supabase";
@@ -14,6 +15,7 @@ import { useUser } from "@/app/context/UserContext";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -157,19 +159,21 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className={styles['login-form']}>
           {/* Username Input */}
           <div className={styles['form-group']}>
-            <label htmlFor="username">Tên đăng nhập</label>
+            <label htmlFor="username">Email</label>
             <div className={styles['input-wrapper']}>
               <input
                 id="username"
                 type="text"
-                placeholder="Nhập tên đăng nhập"
+                placeholder="Nhập email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
                 className={styles['form-input']}
                 required
               />
-              <span className={styles['input-icon']}>👤</span>
+              <span className={styles['input-icon']}>
+                <EnvelopeIcon className="w-5 h-5" />
+              </span>
             </div>
           </div>
 
@@ -179,7 +183,7 @@ export default function LoginPage() {
             <div className={styles['input-wrapper']}>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -187,7 +191,18 @@ export default function LoginPage() {
                 className={styles['form-input']}
                 required
               />
-              <span className={styles['input-icon']}>🔒</span>
+              <button
+                type="button"
+                className={styles['input-button']}
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./signup.module.css";
+import { EyeIcon, EyeSlashIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 // Supabase client
 import { supabase } from "@/lib/supabase";
@@ -15,6 +16,9 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showEmailSuggestion, setShowEmailSuggestion] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -27,6 +31,12 @@ export default function SignupPage() {
     // Validation
     if (!fullName || !username || !password || !confirmPassword) {
       setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    // Email validation
+    if (!username.endsWith('@ttigroup.com.vn')) {
+      setError("Email phải kết thúc bằng @ttigroup.com.vn");
       return;
     }
 
@@ -172,21 +182,44 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Username */}
+          {/* Email Input */}
           <div className={styles['form-group']}>
-            <label htmlFor="username">Tên đăng nhập</label>
+            <label htmlFor="username">Email</label>
             <div className={styles['input-wrapper']}>
               <input
                 id="username"
                 type="text"
-                placeholder="Nhập tên đăng nhập"
+                placeholder="Nhập email"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setUsername(val);
+                  if (val.endsWith('@') && !val.includes('@ttigroup.com.vn')) {
+                    setShowEmailSuggestion(true);
+                  } else if (!val.includes('@')) {
+                    setShowEmailSuggestion(false);
+                  }
+                }}
                 disabled={loading}
                 className={styles['form-input']}
                 required
               />
-              <span className={styles['input-icon']}>👤</span>
+              <span className={styles['input-icon']}>
+                <EnvelopeIcon className="w-5 h-5" />
+              </span>
+
+              {showEmailSuggestion && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUsername(username + "ttigroup.com.vn");
+                    setShowEmailSuggestion(false);
+                  }}
+                  className={styles['email-suggestion']}
+                >
+                  <span>Gợi ý: <strong>{username}ttigroup.com.vn</strong></span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -196,7 +229,7 @@ export default function SignupPage() {
             <div className={styles['input-wrapper']}>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -204,7 +237,18 @@ export default function SignupPage() {
                 className={styles['form-input']}
                 required
               />
-              <span className={styles['input-icon']}>🔒</span>
+              <button
+                type="button"
+                className={styles['input-button']}
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 
@@ -214,7 +258,7 @@ export default function SignupPage() {
             <div className={styles['input-wrapper']}>
               <input
                 id="confirmPassword"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Nhập lại mật khẩu"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -222,7 +266,18 @@ export default function SignupPage() {
                 className={styles['form-input']}
                 required
               />
-              <span className={styles['input-icon']}>🔒</span>
+              <button
+                type="button"
+                className={styles['input-button']}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 

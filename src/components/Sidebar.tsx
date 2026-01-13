@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useUser } from '@/app/context/UserContext';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-    HomeIcon,
+    ShareIcon,
     UserGroupIcon,
     ChartBarSquareIcon,
     CloudArrowUpIcon,
@@ -34,10 +34,11 @@ export default function Sidebar() {
     const userRole = user?.role || null;
 
     const navItems = [
-        { name: 'Org Chart', path: '/Orgchart', icon: UserGroupIcon },
+        { name: 'Org Chart', path: '/Orgchart', icon: ShareIcon },
         { name: 'Dashboard', path: '/Dashboard', icon: ChartBarSquareIcon },
         // { name: 'Import HR Data', path: '/Import_HR_Data', icon: CloudArrowUpIcon },
         { name: 'Edit Table HR', path: '/SheetManager', icon: TableCellsIcon },
+        { name: 'Headcount Open', path: '/Headcount_open', icon: UserGroupIcon },
         { name: 'Customize Chart', path: '/Customize', icon: PencilSquareIcon },
         { name: 'Admin Console', path: '/Admin', icon: Cog6ToothIcon, requiredRole: 'admin' },
     ].filter(item => !item.requiredRole || item.requiredRole === userRole);

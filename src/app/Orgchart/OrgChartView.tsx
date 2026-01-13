@@ -275,6 +275,9 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
         Emp_probation: {
           template: "big_v2",
         },
+        headcount_open: {
+          template: "big_hc_open",
+        },
       },
     });
 

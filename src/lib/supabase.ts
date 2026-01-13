@@ -31,6 +31,15 @@ const createBrowserClient = () => createClient(supabaseUrl, supabaseAnonKey, {
         persistSession: true,
         autoRefreshToken: true,
     },
+    global: {
+        fetch: (url, options = {}) => {
+            return fetch(url, {
+                ...options,
+                // Increase timeout to 60 seconds for cold starts
+                signal: AbortSignal.timeout(60000),
+            });
+        },
+    },
 });
 
 // Use global variable to store client in development to prevent multiple instances on HMR
@@ -54,6 +63,15 @@ export const supabaseAdmin: SupabaseClient = createClient(
         auth: {
             persistSession: false,
             autoRefreshToken: false,
+        },
+        global: {
+            fetch: (url, options = {}) => {
+                return fetch(url, {
+                    ...options,
+                    // Increase timeout to 60 seconds for cold starts
+                    signal: AbortSignal.timeout(60000),
+                });
+            },
         },
     }
 );
