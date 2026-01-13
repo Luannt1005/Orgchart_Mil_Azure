@@ -133,6 +133,81 @@ const Customize = () => {
       patchOrgChartTemplates();
 
 
+      const addDepartment = (nodeId: string) => {
+        const chart = chartInstance.current;
+        if (!chart) return;
+
+        // Generate a safe unique ID that doesn't start with "_" (to avoid being filtered out as internal)
+        const newId = `dept_${Date.now()}`;
+        const data = {
+          id: newId,
+          pid: nodeId,
+          stpid: null,
+          name: "New Department",
+          title: "Department",
+          image: null,
+          tags: ["group"],
+          orig_pid: nodeId,
+          dept: null,
+          BU: null,
+          type: "group",
+          location: null,
+          description: "",
+          joiningDate: ""
+        };
+
+        chart.addNode(data);
+      };
+
+      const addEmployee = (nodeId: string) => {
+        const chart = chartInstance.current;
+        if (!chart) return;
+
+        const newId = `emp_${Date.now()}`;
+        const data = {
+          id: newId,
+          pid: nodeId,
+          stpid: null,
+          name: "New Employee",
+          title: "Position",
+          image: "",
+          tags: [],
+          orig_pid: nodeId,
+          dept: null,
+          BU: null,
+          description: "",
+          // joiningDate: new Date().toISOString().split('T')[0] // Optional
+        };
+
+        chart.addNode(data);
+      };
+
+      const removeNode = (nodeId: string) => {
+        const chart = chartInstance.current;
+        if (!chart) return;
+
+        try {
+          // Workaround for "Cannot read properties of null (reading 'id') at OrgChart.updateNode"
+          // We manually remove the node data and redraw, avoiding the problematic internal removeNode flow
+          if (typeof chart.remove === 'function') {
+            chart.remove(nodeId);
+
+            // Update filter UI (search results) if available
+            if (chart.filterUI && typeof chart.filterUI.update === 'function') {
+              chart.filterUI.update();
+            }
+
+            chart.draw(OrgChart.action.update);
+            setHasChanges(true);
+          } else {
+            // Fallback
+            chart.removeNode(nodeId);
+          }
+        } catch (error) {
+          console.error("Error removing node:", error);
+        }
+      };
+
       chartInstance.current = new OrgChart(chartRef.current, {
         template: "big",
         enableDragDrop: true,
@@ -142,10 +217,23 @@ const Customize = () => {
           img_0: "img"
         },
         nodeMenu: {
+          addDepartment: {
+            text: "Add new department",
+            icon: OrgChart.icon.add(24, 24, "#7A7A7A"),
+            onClick: addDepartment,
+          },
+          addEmployee: {
+            text: "Add new employee",
+            icon: OrgChart.icon.add(24, 24, "#7A7A7A"),
+            onClick: addEmployee,
+          },
           details: { text: "Details" },
           edit: { text: "Edit" },
-          add: { text: "Add" },
-          remove: { text: "Remove" }
+          remove: {
+            text: "Remove",
+            icon: OrgChart.icon.remove(24, 24, "#7A7A7A"),
+            onClick: removeNode
+          }
         },
         tags: {
           group: {
@@ -157,7 +245,46 @@ const Customize = () => {
         },
       });
 
-      chartInstance.current.on('drop', () => setHasChanges(true));
+
+      // Handle drag-drop event
+      chartInstance.current.on('drop', (sender: any, draggedNodeId: any, droppedNodeId: any) => {
+        const draggedNode = sender.getNode(draggedNodeId);
+        const droppedNode = sender.getNode(droppedNodeId);
+
+        if (!draggedNode || !draggedNode.id) return;
+        if (!droppedNode || !droppedNode.id) return;
+
+        // Check if dropping employee onto a department (group)
+        const droppedTags = Array.isArray(droppedNode.tags) ? droppedNode.tags : [];
+        const draggedTags = Array.isArray(draggedNode.tags) ? draggedNode.tags : [];
+
+        if (droppedTags.includes("group") && !draggedTags.includes("group")) {
+          // Use setTimeout to override AFTER default behavior sets pid
+          setTimeout(() => {
+            const draggedNodeData = sender.get(draggedNode.id);
+
+            // Override: set stpid to the group node, clear pid
+            draggedNodeData.stpid = droppedNode.id;
+            draggedNodeData.pid = undefined;
+
+            // Update the node with our custom changes
+            sender.updateNode(draggedNodeData);
+
+            console.log('📦 Moved employee to department via stpid:', {
+              employee: draggedNode.id,
+              department: droppedNode.id,
+              finalData: sender.get(draggedNode.id)
+            });
+          }, 0);
+
+          setHasChanges(true);
+          return false;
+        }
+
+        // For all other drops, mark as changed
+        setHasChanges(true);
+      });
+
       chartInstance.current.on('update', () => setHasChanges(true));
       chartInstance.current.on('remove', () => setHasChanges(true));
       chartInstance.current.on('add', () => setHasChanges(true));
@@ -275,39 +402,58 @@ const Customize = () => {
 
       // Balkangraph store nodes in chart.nodes (map) or chart.config.nodes (array)
       // Different versions might behave differently, so we handle both
+      // Improved node extraction logic
+      const nodesToSave: any[] = [];
       const nodesMap = chart.nodes || {};
-      const nodeIds = Object.keys(nodesMap).filter(id => !id.startsWith("_"));
 
-      if (nodeIds.length === 0 && chart.config?.nodes) {
-        // Fallback to config.nodes if live nodes map is empty
-        const nodesToSave = chart.config.nodes.map((n: any) => {
+      // Iterate safely over all keys in nodesMap
+      Object.keys(nodesMap).forEach(id => {
+        // Skip internal nodes (usually start with _)
+        if (id.toString().startsWith("_")) {
+          console.log("Skipping internal node:", id);
+          return;
+        }
+
+        const fullData = chart.get(id);
+        if (!fullData) return;
+
+        const cleanData: any = {};
+
+        // Copy only data properties, skip internal props and functions
+        Object.keys(fullData).forEach(key => {
+          if (!key.startsWith("_") && typeof fullData[key] !== "function") {
+            cleanData[key] = fullData[key];
+          }
+        });
+
+        // Ensure critical fields are handled
+        if (cleanData.pid === "") cleanData.pid = null;
+        if (cleanData.stpid === "") cleanData.stpid = null;
+
+        // Ensure tags are arrays
+        if (cleanData.tags && typeof cleanData.tags === 'string') {
+          try { cleanData.tags = JSON.parse(cleanData.tags); } catch { }
+        }
+
+        nodesToSave.push(cleanData);
+      });
+
+      console.log(`🔍 Found ${nodesToSave.length} nodes to save.`); // Debug log
+
+      if (nodesToSave.length === 0 && chart.config?.nodes) {
+        // Fallback: If for some reason nodesMap is empty, try config.nodes (but properly)
+        // ... (keep fallback logic if deemed necessary, or just rely on nodesMap if sure)
+        const fallbackNodes = chart.config.nodes.map((n: any) => {
           const clean: any = {};
           Object.keys(n).forEach(key => {
             if (!key.startsWith("_") && typeof n[key] !== "function") clean[key] = n[key];
           });
           return clean;
         });
-
-        await performSave(nodesToSave);
-      } else {
-        const nodesToSave = nodeIds.map(id => {
-          const fullData = chart.get(id);
-          const cleanData: any = {};
-
-          Object.keys(fullData).forEach(key => {
-            if (!key.startsWith("_") && typeof fullData[key] !== "function") {
-              cleanData[key] = fullData[key];
-            }
-          });
-
-          if (cleanData.pid === "") cleanData.pid = null;
-          if (cleanData.stpid === "") cleanData.stpid = null;
-
-          return cleanData;
-        });
-
-        await performSave(nodesToSave);
+        nodesToSave.push(...fallbackNodes);
       }
+
+      await performSave(nodesToSave);
     } catch (err) {
       console.error("Save error:", err);
       alert(`❌ Lỗi lưu dữ liệu: ${err instanceof Error ? err.message : "Vui lòng thử lại"}`);
