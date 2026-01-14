@@ -369,6 +369,19 @@ const SheetManager = ({
           }
         });
 
+        // Add requester info if line manager is being updated to pending
+        if (dataToSave["lineManagerStatus"] === "pending") {
+          try {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+              const user = JSON.parse(userStr);
+              dataToSave["requester"] = user.username || user.full_name || "Unknown";
+            }
+          } catch (e) {
+            console.error("Failed to get user info", e);
+          }
+        }
+
         const response = await fetch("/api/sheet", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -401,9 +414,11 @@ const SheetManager = ({
         dataToUpdate[normalizeFieldName(lmHeader)] = row.pendingLineManager;
         dataToUpdate["lineManagerStatus"] = "approved";
         dataToUpdate["pendingLineManager"] = null;
+        dataToUpdate["requester"] = null;
       } else {
         dataToUpdate["lineManagerStatus"] = "rejected";
         dataToUpdate["pendingLineManager"] = null;
+        dataToUpdate["requester"] = null;
       }
 
       const response = await fetch("/api/sheet", {
@@ -742,12 +757,20 @@ const SheetManager = ({
                           <div className={styles.cellContent}>
                             <span>{DATE_COLUMNS.includes(header) ? formatDate(row[header]) : String(row[header] || "")}</span>
                             {isPending && (
-                              <span className="text-[10px] text-amber-600 font-bold block">
-                                → {row.pendingLineManager}
-                              </span>
+                              <>
+                                <span className="text-[10px] text-amber-600 font-bold block">
+                                  → {row.pendingLineManager}
+                                </span>
+                                {row.requester && (
+                                  <span className="text-[9px] text-gray-500 italic block mt-0.5">
+                                    by {row.requester}
+                                  </span>
+                                )}
+                              </>
                             )}
                           </div>
-                        )}
+                        )
+                        }
                       </td>
                     );
                   })}
@@ -843,53 +866,55 @@ const SheetManager = ({
       </div>
 
       {/* Confirm Modal for Approve All / Reject All */}
-      {confirmModal.show && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center gap-3 mb-4">
-              {confirmModal.type === 'approve' ? (
-                <div className="p-3 bg-green-100 rounded-full">
-                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
-                </div>
-              ) : (
-                <div className="p-3 bg-orange-100 rounded-full">
-                  <NoSymbolIcon className="w-6 h-6 text-orange-600" />
-                </div>
-              )}
-              <h3 className="text-lg font-semibold text-gray-900">
-                {confirmModal.type === 'approve' ? 'Approve All Changes' : 'Reject All Changes'}
-              </h3>
-            </div>
+      {
+        confirmModal.show && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center gap-3 mb-4">
+                {confirmModal.type === 'approve' ? (
+                  <div className="p-3 bg-green-100 rounded-full">
+                    <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                  </div>
+                ) : (
+                  <div className="p-3 bg-orange-100 rounded-full">
+                    <NoSymbolIcon className="w-6 h-6 text-orange-600" />
+                  </div>
+                )}
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {confirmModal.type === 'approve' ? 'Approve All Changes' : 'Reject All Changes'}
+                </h3>
+              </div>
 
-            <p className="text-gray-600 mb-6">
-              {confirmModal.type === 'approve'
-                ? `Are you sure you want to approve all ${confirmModal.count} pending changes? This will apply the new Line Manager values.`
-                : `Are you sure you want to reject all ${confirmModal.count} pending changes? The original Line Manager values will be kept.`
-              }
-            </p>
+              <p className="text-gray-600 mb-6">
+                {confirmModal.type === 'approve'
+                  ? `Are you sure you want to approve all ${confirmModal.count} pending changes? This will apply the new Line Manager values.`
+                  : `Are you sure you want to reject all ${confirmModal.count} pending changes? The original Line Manager values will be kept.`
+                }
+              </p>
 
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setConfirmModal({ show: false, type: null, count: 0 })}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmAction}
-                disabled={saving}
-                className={`px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2 ${confirmModal.type === 'approve'
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-orange-600 hover:bg-orange-700'
-                  }`}
-              >
-                {saving && <ArrowPathIcon className="w-4 h-4 animate-spin" />}
-                {confirmModal.type === 'approve' ? 'Yes, Approve All' : 'Yes, Reject All'}
-              </button>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setConfirmModal({ show: false, type: null, count: 0 })}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmAction}
+                  disabled={saving}
+                  className={`px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2 ${confirmModal.type === 'approve'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-orange-600 hover:bg-orange-700'
+                    }`}
+                >
+                  {saving && <ArrowPathIcon className="w-4 h-4 animate-spin" />}
+                  {confirmModal.type === 'approve' ? 'Yes, Approve All' : 'Yes, Reject All'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <SheetAddModal
         isOpen={showAddModal}
@@ -897,7 +922,7 @@ const SheetManager = ({
         onSave={handleSaveNewEmployee}
         columns={ADD_FORM_COLUMNS}
       />
-    </div>
+    </div >
   );
 };
 

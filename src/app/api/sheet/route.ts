@@ -8,7 +8,7 @@ import { retryOperation } from "@/lib/retry";
 const EMPLOYEES_CACHE_TTL = 15 * 60 * 1000;
 
 // Columns to select for listing - all employee data columns
-const LIST_COLUMNS = 'id, emp_id, full_name, job_title, dept, bu, bu_org_3, dl_idl_staff, location, employee_type, line_manager, joining_date, last_working_day, line_manager_status, pending_line_manager, is_direct';
+const LIST_COLUMNS = 'id, emp_id, full_name, job_title, dept, bu, bu_org_3, dl_idl_staff, location, employee_type, line_manager, joining_date, last_working_day, line_manager_status, pending_line_manager, is_direct, requester';
 
 // Whitelist of allowed filter params -> database columns
 const FILTER_MAPPING: { [key: string]: string } = {
@@ -164,7 +164,8 @@ export async function GET(req: Request) {
         "Joining\r\n Date": emp.joining_date,
         "Last Working\r\nDay": emp.last_working_day,
         lineManagerStatus: emp.line_manager_status,
-        pendingLineManager: emp.pending_line_manager
+        pendingLineManager: emp.pending_line_manager,
+        requester: emp.requester
       }));
 
       const total = totalCount || 0;
@@ -220,7 +221,8 @@ export async function GET(req: Request) {
           "Joining\r\n Date": emp.joining_date,
           "Last Working\r\nDay": emp.last_working_day,
           lineManagerStatus: emp.line_manager_status,
-          pendingLineManager: emp.pending_line_manager
+          pendingLineManager: emp.pending_line_manager,
+          requester: emp.requester
         }));
 
         console.log(`✅ Loaded ${transformedEmployees.length} employees`);
@@ -243,8 +245,8 @@ export async function GET(req: Request) {
     return response;
 
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("GET /api/sheet error:", message);
+    const message = (error as any)?.message || (typeof error === 'string' ? error : "Unknown error");
+    console.error("GET /api/sheet error:", error);
     return NextResponse.json(
       { success: false, error: message },
       { status: 500 }
@@ -374,7 +376,8 @@ export async function POST(req: Request) {
         .from('employees')
         .update({
           line_manager_status: 'rejected',
-          pending_line_manager: null
+          pending_line_manager: null,
+          requester: null
         })
         .eq('line_manager_status', 'pending');
 
@@ -416,7 +419,8 @@ export async function POST(req: Request) {
           .update({
             line_manager: row.pending_line_manager,
             line_manager_status: 'approved',
-            pending_line_manager: null
+            pending_line_manager: null,
+            requester: null
           })
           .eq('id', row.id);
 
@@ -493,6 +497,9 @@ export async function PUT(req: Request) {
     }
     if (data["pending_line_manager"] !== undefined) {
       updateData.pending_line_manager = data["pending_line_manager"];
+    }
+    if (data["requester"] !== undefined) {
+      updateData.requester = data["requester"];
     }
 
     const { error } = await supabaseAdmin

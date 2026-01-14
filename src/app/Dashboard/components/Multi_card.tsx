@@ -96,7 +96,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ className, onFilterChange, acti
                 manager: 0,
                 director: 0,
                 shiftLeader: 0,
-                lineLeader: 0,
+                leader: 0,
                 warehouseKeeper: 0,
                 coordinator: 0,
                 technician: 0,
@@ -106,6 +106,8 @@ const StatsCards: React.FC<StatsCardsProps> = ({ className, onFilterChange, acti
                 staff: 0,
                 idl: 0,
                 dl: 0,
+                clerk: 0,
+                intern: 0,
                 total: 0
             };
         }
@@ -133,12 +135,14 @@ const StatsCards: React.FC<StatsCardsProps> = ({ className, onFilterChange, acti
             manager: countByTitle('manager'),
             director: countByTitle('director'),
             shiftLeader: countByTitle('shift leader'),
-            lineLeader: countByTitle('line leader'),
+            leader: countByTitle('leader') - countByTitle('shift leader'),
             warehouseKeeper: countByTitle('warehouse keeper') + countByTitle('warehouse storekeeper'),
             coordinator: countByTitle('coordinator'),
             technician: countByTitle('technician'),
             operator: countByTitle('operator'),
+            clerk: countByTitle('clerk'),
             trainee: countByTitle('trainee'),
+            intern: countByTitle('intern'),
             engineer: countByTitle('engineer'),
             staff: counts.staff,
             idl: counts.idl,
@@ -148,20 +152,22 @@ const StatsCards: React.FC<StatsCardsProps> = ({ className, onFilterChange, acti
     }, [nodes]);
 
     // Order: High level to Low level
-    // Director -> Manager -> Supervisor -> Shift Leader -> Line Leader -> Engineer -> Specialist -> Coordinator -> Technician -> Operator -> WH Keeper -> Trainee
+    // Director -> Manager -> Supervisor -> Shift Leader -> Line Leader -> Engineer -> Specialist -> Coordinator -> Technician -> Operator -> WH Keeper -> Clerk -> Trainee -> Intern
     const titleCards: CardInfo[] = [
         { title: 'Director', count: stats.director, filterType: 'title', filterValue: 'director' },
         { title: 'Manager', count: stats.manager, filterType: 'title', filterValue: 'manager' },
         { title: 'Supervisor', count: stats.supervisor, filterType: 'title', filterValue: 'supervisor' },
         { title: 'Shift Leader', count: stats.shiftLeader, filterType: 'title', filterValue: 'shift leader' },
-        { title: 'Line Leader', count: stats.lineLeader, filterType: 'title', filterValue: 'line leader' },
+        { title: 'Leader', count: stats.leader, filterType: 'title', filterValue: 'leader' },
         { title: 'Engineer', count: stats.engineer, filterType: 'title', filterValue: 'engineer' },
         { title: 'Specialist', count: stats.specialist, filterType: 'title', filterValue: 'specialist' },
         { title: 'Coordinator', count: stats.coordinator, filterType: 'title', filterValue: 'coordinator' },
         { title: 'Technician', count: stats.technician, filterType: 'title', filterValue: 'technician' },
         { title: 'Operator', count: stats.operator, filterType: 'title', filterValue: 'operator' },
         { title: 'WH Keeper', count: stats.warehouseKeeper, filterType: 'title', filterValue: 'warehouse keeper' },
-        { title: 'Trainee', count: stats.trainee, filterType: 'title', filterValue: 'trainee' }
+        { title: 'Clerk', count: stats.clerk, filterType: 'title', filterValue: 'clerk' },
+        { title: 'Trainee', count: stats.trainee, filterType: 'title', filterValue: 'trainee' },
+        { title: 'Intern', count: stats.intern, filterType: 'title', filterValue: 'intern' }
     ];
 
     // Show cards: Use the predefined hierarchical order.

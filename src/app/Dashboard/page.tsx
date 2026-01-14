@@ -296,7 +296,7 @@ export default function DashboardPage() {
                         {/* Row 1: KPI Cards (fixed height) */}
                         <div className="shrink-0 min-h-[74px]">
                             <StatsCards
-                                className="grid grid-cols-6 gap-3"
+                                className="grid grid-cols-7 gap-3"
                                 onFilterChange={handleFilterChange}
                                 activeFilter={legacyActiveFilterState}
                                 nodes={dashboardNodes} // Keep using dashboardNodes to show overview stats

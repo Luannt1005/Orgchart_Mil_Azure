@@ -256,15 +256,15 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
           icon: OrgChart.icon.add(24, 24, "#7A7A7A"),
           onClick: addDepartment,
         },
-        edit: { text: "Edit" },
+        // edit: { text: "Edit" },
         details: { text: "Details" },
-        add: { text: "Add" },
-        remove: { text: "Remove" },
+        // add: { text: "Add" },
+        // remove: { text: "Remove" },
       },
-      editForm: {
-        cancelBtn: "Close",
-        saveAndCloseBtn: "Save",
-      },
+      // editForm: {
+      //   cancelBtn: "Close",
+      //   saveAndCloseBtn: "Save",
+      // },
       tags: {
         group: {
           template: "group",
