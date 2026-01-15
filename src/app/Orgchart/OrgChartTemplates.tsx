@@ -180,7 +180,7 @@ export function patchOrgChartTemplates() {
 
   OrgChart.templates.big_hc_open.node = `
 <rect x="0" y="50" height="330" width="230"
-      fill="gray"
+      fill="white"
       stroke="#E5E7EB"
       stroke-width="1"
       rx="0" ry="0"
