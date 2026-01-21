@@ -5,6 +5,7 @@ declare module "@/lib/orgchart" {
         static templates: { [key: string]: any };
         static icon: any;
         static action: any;
+        static editUI: any;
         static match: any;
         static none: any;
         static normal: any;

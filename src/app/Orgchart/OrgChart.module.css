@@ -67,6 +67,174 @@
     stroke-width: 3px !important;
 }
 
+/* My Profile / Edit Form Styling */
+/* =========================================
+   CUSTOM FORM STYLING (Milwaukee Theme) 
+   ========================================= */
+
+/* Form Container */
+.treeContainer :global(.boc-edit-form) {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    overflow: visible !important;
+    border: 1px solid rgba(229, 231, 235, 1) !important;
+    /* gray-200 */
+    font-family: 'Inter', sans-serif !important;
+    width: 400px !important;
+    max-width: 90vw;
+}
+
+/* Header Section */
+.treeContainer :global(.boc-edit-form-header) {
+    background-color: #DB011C !important;
+    /* Milwaukee Red */
+    padding: 30px 24px 90px 24px !important;
+    /* Increased top padding to push title down */
+    text-align: center;
+    position: relative;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Header Title (Name) */
+.treeContainer :global(.boc-edit-form-title) {
+    color: #ffffff !important;
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    margin-bottom: 20px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+
+/* Avatar Image Container */
+.treeContainer :global(.boc-edit-form-avatar) {
+    position: absolute !important;
+    bottom: -90px !important;
+    /* Moves avatar down */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    width: 160px !important;
+    height: 160px !important;
+    z-index: 10;
+
+    background: transparent !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Avatar Image & SVG fixes */
+.treeContainer :global(.boc-edit-form-avatar > img),
+.treeContainer :global(.boc-edit-form-avatar > svg) {
+    border: 6px solid #ffffff !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 50% !important;
+    width: 160px !important;
+    height: 160px !important;
+    object-fit: cover !important;
+    background-color: #fff;
+    display: block !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+/* HIDE extra SVG background elements that cause the 'oval' effect */
+.treeContainer :global(.boc-edit-form-avatar svg:not([viewBox])) {
+    display: none !important;
+}
+
+/* Force correct stacking context */
+.treeContainer :global(.boc-edit-form-instruments) {
+    display: none !important;
+}
+
+/* Close Button */
+.treeContainer :global(.boc-edit-form-close) {
+    top: 15px !important;
+    right: 15px !important;
+    cursor: pointer;
+}
+
+.treeContainer :global(.boc-edit-form-close path) {
+    fill: rgba(255, 255, 255, 0.9) !important;
+}
+
+.treeContainer :global(.boc-edit-form-close:hover path) {
+    fill: #ffffff !important;
+}
+
+/* Form Fields Container */
+.treeContainer :global(.boc-edit-form-fields) {
+    /* Increased top padding to 135px to clear lower avatar */
+    padding: 135px 8px 30px 8px !important;
+    background-color: #ffffff !important;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* Individual Field Wrapper */
+.treeContainer :global(.boc-form-field) {
+    margin-bottom: 24px !important;
+    position: relative !important;
+    display: block !important;
+}
+
+/* Labels */
+.treeContainer :global(.boc-form-field label) {
+    display: block !important;
+    color: #4b5563 !important;
+    /* gray-600 */
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px !important;
+    text-align: left !important;
+    margin-left: 4px;
+    /* Tiny offset from absolute edge */
+}
+
+/* Inputs (Read-only styling) */
+.treeContainer :global(.boc-form-field input),
+.treeContainer :global(.boc-form-field select),
+.treeContainer :global(.boc-input input) {
+    width: 100% !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    color: #111827 !important;
+    padding: 8px 4px !important;
+    border-radius: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    pointer-events: none;
+    margin: 0 !important;
+}
+
+/* Hide "Add More" link and its container explicitly */
+.treeContainer :global(.boc-edit-form-fields a),
+.treeContainer :global(a[data-add-more-fields-btn]),
+.treeContainer :global(.boc-edit-form-fields div[style*="text-align:center"]) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 /* Scrollbar */
 .treeContainer :global(::-webkit-scrollbar) {
     width: 6px;

@@ -82,7 +82,7 @@ export function useOrgData(options?: UseOrgDataOptions) {
     new Set(
       nodes
         .map(node => node.dept)
-        .filter((d) => typeof d === "string" && d.trim() !== "")
+        .filter((d): d is string => typeof d === "string" && d.trim() !== "")
     )
   ).sort();
 

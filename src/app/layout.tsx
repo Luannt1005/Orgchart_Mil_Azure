@@ -44,14 +44,16 @@ export default function RootLayout({
             <Sidebar />
             <div className="flex-1 flex flex-col min-w-0 h-full">
               <Header />
-              <main className="flex-1 overflow-auto bg-[var(--color-bg-page)] relative p-4 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent transition-colors duration-300">
-                <PageTransition>
-                  {children}
-                </PageTransition>
+              <main className="flex-1 overflow-auto bg-[var(--color-bg-page)] relative scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent transition-colors duration-300 flex flex-col">
+                <div className="p-4 flex-1">
+                  <PageTransition>
+                    {children}
+                  </PageTransition>
+                </div>
+                <AppFooter />
               </main>
             </div>
           </div>
-          <AppFooter />
         </UserProvider>
       </body>
     </html>

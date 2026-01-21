@@ -212,6 +212,8 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
 
     patchOrgChartTemplates();
 
+
+
     const chartNodes = nodes.map((n: any) => ({
       ...n,
       tags: Array.isArray(n.tags) ? n.tags : [],
@@ -250,21 +252,36 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
         field_1: "title",
         img_0: "img",
       },
-      nodeMenu: {
-        addDepartment: {
-          text: "Add new department",
-          icon: OrgChart.icon.add(24, 24, "#7A7A7A"),
-          onClick: addDepartment,
-        },
-        // edit: { text: "Edit" },
-        details: { text: "Details" },
-        // add: { text: "Add" },
-        // remove: { text: "Remove" },
-      },
-      // editForm: {
-      //   cancelBtn: "Close",
-      //   saveAndCloseBtn: "Save",
+      // nodeMenu: {
+      //   addDepartment: {
+      //     text: "Add new department",
+      //     icon: OrgChart.icon.add(24, 24, "#7A7A7A"),
+      //     onClick: addDepartment,
+      //   },
+      //   // edit: { text: "Edit" },
+      //   details: { text: "Details" },
+      //   // add: { text: "Add" },
+      //   // remove: { text: "Remove" },
       // },
+      editForm: {
+        readOnly: true,
+        generateElementsFromFields: false,
+        elements: [
+          { type: "textbox", label: "Name", binding: "name" },
+          { type: "textbox", label: "Title", binding: "title" },
+          { type: "textbox", label: "Department", binding: "dept" },
+          { type: "textbox", label: "Business Unit", binding: "BU" },
+          { type: "textbox", label: "Location", binding: "location" },
+          // { type: "textbox", label: "Description", binding: "description" },
+          { type: "date", label: "Joining Date", binding: "joiningDate" }
+        ],
+        buttons: {
+          edit: null, // Disable edit button
+          share: null,
+          pdf: null,
+          remove: null,
+        },
+      },
       tags: {
         group: {
           template: "group",
