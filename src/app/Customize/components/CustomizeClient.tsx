@@ -8,15 +8,19 @@ import CustomizeHeader from "./CustomizeHeader";
 import CreateProfileModal from "./CreateProfileModal";
 import { useOrgProfileManager } from "../hooks/useOrgProfileManager";
 import { useOrgChartEditor } from "../hooks/useOrgChartEditor";
+import EditNodeModal from "./EditNodeModal";
 
 const CustomizeClient = () => {
     const chartRef = useRef<HTMLDivElement>(null);
-    const { groups, loading: groupsLoading } = useOrgData();
+    const { groups, loading: groupsLoading, nodes: allNodes } = useOrgData();
 
     // State Hooks
     const [user, setUser] = useState<any>(null);
     const [orgId, setOrgId] = useState<string>("");
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+    const [selectedNodeData, setSelectedNodeData] = useState<any>(null);
 
     const username = user?.username || "admin";
 
@@ -37,14 +41,21 @@ const CustomizeClient = () => {
         performCreate
     } = useOrgProfileManager({ user });
 
-    const handleChartNotFound = useCallback(() => {
-        fetchOrgList();
-        setOrgId("");
-    }, [fetchOrgList]);
+    // --- State for Edit Modal ---
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [selectedNodeDataForEdit, setSelectedNodeDataForEdit] = useState<any>(null); // Renamed to avoid conflict
 
+    // --- Handlers ---
+    const handleNodeClick = useCallback((nodeData: any) => {
+        setSelectedNodeDataForEdit(nodeData);
+        setEditModalOpen(true);
+    }, []);
+
+    // 4. Chart Manager Hook
     const {
         loadChartData,
         saveChart,
+        updateNodeData,
         loadingChart,
         isSaving,
         lastSaveTime,
@@ -55,10 +66,23 @@ const CustomizeClient = () => {
         chartRef,
         orgId,
         username,
-        handleChartNotFound
+        allNodes, // Pass global nodes for auto-mapping
+        useCallback(() => {
+            // On chart not found
+            fetchOrgList();
+            setOrgId("");
+        }, [fetchOrgList]),
+        handleNodeClick // Pass custom click handler
     );
 
-    // --- Handlers ---
+    const handleSaveNode = (originalId: string, newData: any) => {
+        if (updateNodeData) {
+            updateNodeData(originalId, newData);
+        }
+    };
+
+    // 5. Derived State
+    const currentOrgName = orgList.find(o => o.orgchart_id === orgId)?.orgchart_name || ""; // Corrected property name from org_id to orgchart_id and org_name to orgchart_name
 
     const handleCreateOrgChart = async (newOrgName: string, newOrgDesc: string, selectedDept: string) => {
         try {
@@ -178,6 +202,14 @@ const CustomizeClient = () => {
                 onClose={() => setShowCreateModal(false)}
                 onCreate={handleCreateOrgChart}
                 groups={groups}
+            />
+
+            <EditNodeModal
+                isOpen={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                onSave={handleSaveNode}
+                nodeData={selectedNodeDataForEdit}
+                allNodes={allNodes}
             />
         </div>
     );

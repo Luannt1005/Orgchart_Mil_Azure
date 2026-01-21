@@ -6,7 +6,9 @@ export function useOrgChartEditor(
     chartContainerRef: RefObject<HTMLDivElement | null>,
     orgId: string,
     username: string,
-    onChartNotFound?: () => void
+    allNodes: any[],
+    onChartNotFound?: () => void,
+    onNodeClick?: (nodeData: any) => void
 ) {
     const chartInstance = useRef<any>(null);
     const originalNodesRef = useRef<any[]>([]);
@@ -15,6 +17,37 @@ export function useOrgChartEditor(
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaveTime, setLastSaveTime] = useState<string | null>(null);
     const [hasChanges, setHasChanges] = useState(false);
+
+    /* ================= HELPER: UPDATE NODE DATA ================= */
+    // Exposed helper to allow external components (like a Modal) to update the chart
+    const updateNodeData = useCallback((originalId: string, newData: any) => {
+        if (!chartInstance.current) return;
+
+        const newId = newData.id;
+        const oldId = originalId;
+
+        // 1. Handle ID Change
+        if (newId && oldId && newId !== oldId) {
+            // Check for duplicate ID
+            if (chartInstance.current.get(newId)) {
+                alert(`❌ Employee ID "${newId}" already exists! Please choose a unique ID.`);
+                return false;
+            }
+
+            // Update other properties using OLD ID first
+            const dataWithOldId = { ...newData, id: oldId };
+            chartInstance.current.updateNode(dataWithOldId);
+
+            // Replace ID
+            chartInstance.current.replaceIds({ [oldId]: newId });
+        } else {
+            // 2. Normal Update (same ID)
+            chartInstance.current.updateNode(newData);
+        }
+
+        setHasChanges(true);
+        return true;
+    }, []);
 
     /* ================= LOAD CHART DATA ================= */
     const loadChartData = useCallback(async (selectedOrgId: string) => {
@@ -144,6 +177,8 @@ export function useOrgChartEditor(
                     field_1: "title",
                     img_0: "img"
                 },
+                // Disable default click behavior (which opens details/edit)
+                nodeMouseClick: OrgChart.action.none,
                 nodeMenu: {
                     addDepartment: {
                         text: "Add new department",
@@ -155,8 +190,10 @@ export function useOrgChartEditor(
                         icon: OrgChart.icon.add(24, 24, "#7A7A7A"),
                         onClick: addEmployee,
                     },
-                    details: { text: "Details" },
-                    edit: { text: "Edit" },
+                    // We remove default 'details' and 'edit' from menu as well, or keep them but handled custom?
+                    // Let's keep context menu simple for now or map 'edit' to our custom logic if possible.
+                    // For now, removing 'details'/'edit' from context menu effectively forces usage of click or our custom flow.
+                    // But 'remove' is crucial.
                     remove: {
                         text: "Remove",
                         icon: OrgChart.icon.remove(24, 24, "#7A7A7A"),
@@ -170,6 +207,17 @@ export function useOrgChartEditor(
             });
 
             // --- Bind Events ---
+
+            // Custom Click Handler
+            chartInstance.current.on('click', (sender: any, args: any) => {
+                const nodeId = args.node.id;
+                const nodeData = sender.get(nodeId);
+                if (onNodeClick && nodeData) {
+                    onNodeClick(nodeData);
+                }
+                return false; // Prevent default behavior
+            });
+
             chartInstance.current.on('drop', (sender: any, draggedNodeId: any, droppedNodeId: any) => {
                 const draggedNode = sender.getNode(draggedNodeId);
                 const droppedNode = sender.getNode(droppedNodeId);
@@ -208,7 +256,7 @@ export function useOrgChartEditor(
         } finally {
             setLoadingChart(false);
         }
-    }, [onChartNotFound, chartContainerRef]);
+    }, [onChartNotFound, chartContainerRef, allNodes]);
 
 
     /* ================= SAVE CHANGES ================= */
@@ -300,6 +348,7 @@ export function useOrgChartEditor(
     return {
         loadChartData,
         saveChart,
+        updateNodeData, // Expose this helper
         loadingChart,
         isSaving,
         lastSaveTime,
