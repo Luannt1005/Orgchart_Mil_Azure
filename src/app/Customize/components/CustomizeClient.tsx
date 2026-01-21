@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useOrgData } from "@/hooks/useOrgData";
 import LoadingScreen from "@/components/loading-screen";
-import styles from "../../app/Orgchart/OrgChart.module.css";
+import styles from "../../Orgchart/OrgChart.module.css";
 import CustomizeHeader from "./CustomizeHeader";
 import CreateProfileModal from "./CreateProfileModal";
-import { useOrgProfileManager } from "@/hooks/useOrgProfileManager";
-import { useOrgChartEditor } from "@/hooks/useOrgChartEditor";
+import { useOrgProfileManager } from "../hooks/useOrgProfileManager";
+import { useOrgChartEditor } from "../hooks/useOrgChartEditor";
 
 const CustomizeClient = () => {
     const chartRef = useRef<HTMLDivElement>(null);

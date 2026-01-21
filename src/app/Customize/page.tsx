@@ -1,6 +1,6 @@
 'use client';
 
-import CustomizeClient from '@/components/Customize/CustomizeClient';
+import CustomizeClient from './components/CustomizeClient';
 
 const Customize = () => {
   return <CustomizeClient />;
