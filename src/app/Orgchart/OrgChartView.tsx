@@ -455,6 +455,7 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
         isOpen={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}
         nodeData={selectedNodeData}
+        allNodes={nodes}
       />
     </>
   );

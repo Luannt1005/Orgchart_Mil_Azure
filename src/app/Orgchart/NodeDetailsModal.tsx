@@ -1,17 +1,95 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useMemo } from 'react';
 
 interface NodeDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     nodeData: any | null;
+    allNodes: any[];
 }
 
 export default function NodeDetailsModal({
     isOpen,
     onClose,
-    nodeData
+    nodeData,
+    allNodes = []
 }: NodeDetailsModalProps) {
+
+    const stats = useMemo(() => {
+        if (!nodeData || !allNodes || allNodes.length === 0) return null;
+
+        const counts = {
+            director: 0,
+            manager: 0,
+            supervisor: 0,
+            specialist: 0,
+            engineer: 0,
+            idl: 0,
+            total: 0
+        };
+
+        const visited = new Set<string>();
+        const queue = [nodeData];
+        // Don't count the node itself, so we start processing children immediately
+        // Actually the queue approach processes the current node first if we aren't careful.
+        // Let's use a function to get children and only add children to traverse.
+
+        // Reset queue to just children of the selected node
+        const isGroup = nodeData.tags?.includes('group');
+        const initialChildren = allNodes.filter(n =>
+            isGroup ? n.stpid === nodeData.id : n.pid === nodeData.id
+        );
+
+        const traversalQueue = [...initialChildren];
+        initialChildren.forEach(child => visited.add(child.id));
+
+        while (traversalQueue.length > 0) {
+            const current = traversalQueue.shift();
+            if (!current) continue;
+
+            // If current node is a group, we don't count it in stats, but we traverse its children
+            const isStructuralNode = current.tags?.includes('group') || current.tags?.includes('indirect_group');
+            const isVacant = current.tags?.includes('headcount_open');
+
+            // Only count if it's a real person (not a group structure and not a vacant position)
+            if (!isStructuralNode && !isVacant) {
+                const title = (current.title || '').toLowerCase();
+                const type = (current.type || '').toLowerCase();
+
+                if (title.includes('director')) counts.director++;
+                else if (title.includes('manager')) counts.manager++;
+                else if (title.includes('supervisor')) counts.supervisor++;
+                else if (title.includes('specialist')) counts.specialist++;
+                else if (title.includes('engineer')) counts.engineer++;
+
+                // IDL Check
+                if (type === 'idl' || current.tags?.includes('idl')) {
+                    counts.idl++;
+                }
+                counts.total++;
+            }
+
+            // Find children of this node
+            const isCurrentGroup = current.tags?.includes('group');
+            const children = allNodes.filter(n =>
+                // If it's a group, get members (stpid). If it's a person/role, get reports (pid).
+                // However, usually we just want to follow the hierarchy down.
+                // If we are traversing down, and we hit a group, we should probably look for its stpid members.
+                // If we hit a person, we look for pid reports.
+                isCurrentGroup ? n.stpid === current.id : n.pid === current.id
+            );
+
+            for (const child of children) {
+                if (!visited.has(child.id)) {
+                    visited.add(child.id);
+                    traversalQueue.push(child);
+                }
+            }
+        }
+
+        return counts;
+    }, [nodeData, allNodes]);
+
     if (!nodeData) return null;
 
     return (
@@ -98,6 +176,9 @@ export default function NodeDetailsModal({
                                     {/* Divider */}
                                     <div className="h-px bg-gray-100 w-full mb-6"></div>
 
+                                    {/* HEADCOUNT STATS TAGS - NEW SECTION */}
+
+
                                     {/* Details Grid */}
                                     <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
 
@@ -148,6 +229,45 @@ export default function NodeDetailsModal({
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* HEADCOUNT STATS TAGS - Moved to bottom */}
+                                    {stats && stats.total > 0 && (
+                                        <div className="mt-8 border-t border-gray-100 pt-6">
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">Span of Control ({stats.total})</p>
+                                            <div className="flex flex-wrap justify-center gap-2">
+                                                {stats.director > 0 && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                                                        Director: {stats.director}
+                                                    </span>
+                                                )}
+                                                {stats.manager > 0 && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                        Manager: {stats.manager}
+                                                    </span>
+                                                )}
+                                                {stats.supervisor > 0 && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                                        Supervisor: {stats.supervisor}
+                                                    </span>
+                                                )}
+                                                {stats.specialist > 0 && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                                                        Specialist: {stats.specialist}
+                                                    </span>
+                                                )}
+                                                {stats.engineer > 0 && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200">
+                                                        Engineer: {stats.engineer}
+                                                    </span>
+                                                )}
+                                                {stats.idl > 0 && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                                        IDL: {stats.idl}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>
