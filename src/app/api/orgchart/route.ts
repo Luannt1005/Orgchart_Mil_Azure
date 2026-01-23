@@ -4,7 +4,7 @@ import { getCachedData } from "@/lib/cache";
 
 // Cache TTL: 15 minutes for orgchart data
 const ORGCHART_CACHE_TTL = 15 * 60 * 1000;
-const IMAGE_BASE_URL = "https://raw.githubusercontent.com/Luannt1005/test-images/main/";
+const IMAGE_BASE_URL = "https://jugotvbkvknjcxrgyyfq.supabase.co/storage/v1/object/public/Mil%20VN%20Images/uploads/";
 
 interface Employee {
   id: string;
@@ -157,7 +157,7 @@ export async function GET(req: Request) {
 
           const joiningDate = formatDate(emp.joining_date) || "";
           const tags = ["emp"];
-          let imageUrl = `${IMAGE_BASE_URL}${empId}.jpg`;
+          let imageUrl = `${IMAGE_BASE_URL}${empId}.webp`;
 
           // Handle Headcount Open
           if (emp.employee_type === 'hc_open') {
