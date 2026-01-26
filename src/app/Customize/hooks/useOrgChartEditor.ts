@@ -264,6 +264,47 @@ export function useOrgChartEditor(
     }, [onChartNotFound, chartContainerRef, allNodes]);
 
 
+    /* ================= MOVE NODE ================= */
+    const moveNode = useCallback((nodeId: string, direction: 'left' | 'right') => {
+        const chart = chartInstance.current;
+        if (!chart) return;
+
+        const nodes = chart.config.nodes as any[];
+        const nodeIndex = nodes.findIndex(n => n.id === nodeId);
+        if (nodeIndex === -1) return;
+
+        const node = nodes[nodeIndex];
+        const pid = node.pid;
+        const stpid = node.stpid;
+
+        // Find siblings (nodes with same pid and stpid)
+        const siblings = nodes.filter(n => n.pid == pid && n.stpid == stpid);
+
+        // Find index of current node within siblings
+        const siblingIndex = siblings.findIndex(n => n.id === nodeId);
+        if (siblingIndex === -1) return;
+
+        // Calculate target index
+        const targetSiblingIndex = direction === 'left' ? siblingIndex - 1 : siblingIndex + 1;
+
+        // Check bounds
+        if (targetSiblingIndex < 0 || targetSiblingIndex >= siblings.length) return;
+
+        const targetSibling = siblings[targetSiblingIndex];
+        const targetNodeIndex = nodes.findIndex(n => n.id === targetSibling.id);
+
+        if (targetNodeIndex === -1) return;
+
+        // Swap in the main array
+        const temp = nodes[nodeIndex];
+        nodes[nodeIndex] = nodes[targetNodeIndex];
+        nodes[targetNodeIndex] = temp;
+
+        // Reload chart with new order
+        chart.load(nodes);
+        setHasChanges(true);
+    }, []);
+
     /* ================= SAVE CHANGES ================= */
     const saveChart = async () => {
         if (!chartInstance.current || isSaving || !orgId) return;
@@ -273,21 +314,22 @@ export function useOrgChartEditor(
             const chart = chartInstance.current;
             const nodesToSave: any[] = [];
 
-            // Logic to clean and gather nodes
-            const nodesMap = chart.nodes || {};
-            // Gather from map
-            Object.keys(nodesMap).forEach(id => {
-                if (id.toString().startsWith("_")) return;
-                const fullData = chart.get(id);
-                if (!fullData) return;
+            // Use config.nodes to preserve order!
+            // This is the CRITICAL change for "Move Left/Right" feature
+            const currentConfigNodes = chart.config.nodes || [];
+
+            currentConfigNodes.forEach((n: any) => {
+                if (n.id.toString().startsWith("_")) return;
 
                 const cleanData: any = {};
-                Object.keys(fullData).forEach(key => {
-                    if (!key.startsWith("_") && typeof fullData[key] !== "function") {
-                        cleanData[key] = fullData[key];
+                // Only save necessary fields, but iterate keys from the node object
+                Object.keys(n).forEach(key => {
+                    if (!key.startsWith("_") && typeof n[key] !== "function") {
+                        cleanData[key] = n[key];
                     }
                 });
 
+                // Ensure consistency
                 if (cleanData.pid === "") cleanData.pid = null;
                 if (cleanData.stpid === "") cleanData.stpid = null;
                 if (cleanData.tags && typeof cleanData.tags === 'string') {
@@ -296,18 +338,6 @@ export function useOrgChartEditor(
 
                 nodesToSave.push(cleanData);
             });
-
-            // Fallback if map empty
-            if (nodesToSave.length === 0 && chart.config?.nodes) {
-                const fallbackNodes = chart.config.nodes.map((n: any) => {
-                    const clean: any = {};
-                    Object.keys(n).forEach(key => {
-                        if (!key.startsWith("_") && typeof n[key] !== "function") clean[key] = n[key];
-                    });
-                    return clean;
-                });
-                nodesToSave.push(...fallbackNodes);
-            }
 
             await performSave(nodesToSave);
 
@@ -357,6 +387,7 @@ export function useOrgChartEditor(
         addDepartment, // Expose
         addEmployee,   // Expose
         removeNode,    // Expose
+        moveNode,      // Expose for swapping
         loadingChart,
         isSaving,
         lastSaveTime,
