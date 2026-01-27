@@ -185,8 +185,17 @@ export function patchOrgChartTemplates(enableEditFeatures = false) {
     OrgChart.templates.group.node += GROUP_MOVE_BUTTONS_SVG;
   }
 
-  OrgChart.templates.group.field_0 =
-    '<text data-width="480" style="font-size: 23px; font-weight: 1000; text-transform: uppercase;" fill="#000" x="{cw}" y="42" text-anchor="middle">{val}</text>';
+  OrgChart.templates.group.field_0 = `
+    <g transform="translate({cw}, 0)">
+        <foreignObject x="-140" y="0" width="280" height="60">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="width: 280px; height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; white-space: normal; word-break: break-word; overflow: hidden;">
+                <div style="font-size: 18px; font-weight: 900; text-transform: uppercase; color: #000; line-height: 1.1; max-height: 55px; padding: 0 5px;">
+                    {val}
+                </div>
+            </div>
+        </foreignObject>
+    </g>
+  `;
 
   OrgChart.templates.group.link =
     '<path stroke-linejoin="round" stroke="#000" stroke-width="2px" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
