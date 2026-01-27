@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import UserManagement from "./components/UserManagement";
-import DataImport from "./components/DataImport";
+import DataImport from "@/components/DataImport";
 import SheetManagerTable from "@/components/SheetManagerTable";
 
 // Icons
@@ -24,6 +24,15 @@ export default function AdminDashboard() {
     const [pendingCount, setPendingCount] = useState<number>(0);
     const [isAuthorized, setIsAuthorized] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Check query params for active tab
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab === 'import' || tab === 'users' || tab === 'approvals') {
+            setActiveTab(tab as MainTab);
+        }
+    }, [searchParams]);
 
     // specific check for admin role
     useEffect(() => {
@@ -74,9 +83,9 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-transparent font-sans text-slate-800 flex flex-col">
+        <div className="min-h-screen bg-transparent font-sans text-[var(--color-text-body)] flex flex-col">
             {/* Header / Tabs */}
-            <header className="bg-white border-b border-gray-200 px-6 shrink-0 rounded-md shadow-md mx-6 mt-4">
+            <header className="bg-[var(--color-bg-card)] border-b border-[var(--color-border)] px-6 shrink-0 rounded-md shadow-md mx-6 mt-4">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-3">
@@ -86,10 +95,10 @@ export default function AdminDashboard() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </div>
-                            <h1 className="text-lg font-bold text-gray-900 tracking-tight">Admin Console</h1>
+                            <h1 className="text-lg font-bold text-[var(--color-text-title)] tracking-tight">Admin Console</h1>
                         </div>
 
-                        <div className="h-6 w-px bg-gray-200"></div>
+                        <div className="h-6 w-px bg-[var(--color-border-light)]"></div>
 
                         <nav className="flex space-x-1">
                             <button
@@ -97,8 +106,8 @@ export default function AdminDashboard() {
                                 className={`
                                     inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all
                                     ${activeTab === 'users'
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}
+                                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-title)] hover:bg-[var(--color-bg-page)]'}
                                 `}
                             >
                                 <UsersIcon className="w-5 h-5 mr-2" />
@@ -109,8 +118,8 @@ export default function AdminDashboard() {
                                 className={`
                                     inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all
                                     ${activeTab === 'import'
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}
+                                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-title)] hover:bg-[var(--color-bg-page)]'}
                                 `}
                             >
                                 <CloudArrowUpIcon className="w-5 h-5 mr-2" />
@@ -121,8 +130,8 @@ export default function AdminDashboard() {
                                 className={`
                                     inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all
                                     ${activeTab === 'approvals'
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}
+                                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-title)] hover:bg-[var(--color-bg-page)]'}
                                 `}
                             >
                                 <ClipboardDocumentCheckIcon className="w-5 h-5 mr-2" />
@@ -135,7 +144,7 @@ export default function AdminDashboard() {
 
             {/* Main Content */}
             <main className="flex-1 p-6 overflow-hidden">
-                <div className="h-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                <div className="h-full bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-[var(--color-border-light)] overflow-hidden flex flex-col">
                     {activeTab === 'users' && (
                         <div className="h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <UserManagement />
@@ -144,21 +153,21 @@ export default function AdminDashboard() {
 
                     {activeTab === 'import' && (
                         <div className="h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <DataImport />
+                            <DataImport mode="excel" />
                         </div>
                     )}
 
                     {activeTab === 'approvals' && (
                         <div className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-300">
                             {/* Sub-tabs for Approvals */}
-                            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200 shrink-0">
+                            <div className="flex items-center gap-2 px-4 py-3 bg-[var(--color-bg-page)] border-b border-[var(--color-border-light)] shrink-0">
                                 <button
                                     onClick={() => setApprovalSubTab('allData')}
                                     className={`
                                         inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all
                                         ${approvalSubTab === 'allData'
-                                            ? 'bg-white text-emerald-700 shadow-sm border border-gray-200'
-                                            : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'}
+                                            ? 'bg-[var(--color-bg-card)] text-emerald-700 shadow-sm border border-[var(--color-border-light)] dark:text-emerald-400'
+                                            : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-title)] hover:bg-[var(--color-bg-card)]/50'}
                                     `}
                                 >
                                     <TableCellsIcon className="w-4 h-4 mr-2" />
@@ -169,8 +178,8 @@ export default function AdminDashboard() {
                                     className={`
                                         inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all
                                         ${approvalSubTab === 'reviewChanges'
-                                            ? 'bg-white text-amber-700 shadow-sm border border-gray-200'
-                                            : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'}
+                                            ? 'bg-[var(--color-bg-card)] text-amber-700 shadow-sm border border-[var(--color-border-light)] dark:text-amber-400'
+                                            : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-title)] hover:bg-[var(--color-bg-card)]/50'}
                                     `}
                                 >
                                     <ClockIcon className="w-4 h-4 mr-2" />

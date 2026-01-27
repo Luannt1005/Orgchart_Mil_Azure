@@ -161,7 +161,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-8 dark:bg-gray-900 transition-colors duration-200">
+        <div className="min-h-screen bg-[var(--color-bg-page)] p-4 sm:p-8 transition-colors duration-200 font-sans text-[var(--color-text-body)]">
             <div className="mx-auto max-w-5xl space-y-8">
                 {/* Header */}
                 <div className="flex items-center space-x-4">
@@ -169,16 +169,16 @@ export default function ProfilePage() {
                         <UserCircleIcon className="h-10 w-10 text-red-600 dark:text-red-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
-                        <p className="text-gray-500 dark:text-gray-400">Manage your personal information and security</p>
+                        <h1 className="text-2xl font-bold text-[var(--color-text-title)]">Profile Settings</h1>
+                        <p className="text-[var(--color-text-muted)]">Manage your personal information and security</p>
                     </div>
                 </div>
 
                 {/* Message Toast (Global) */}
                 {message && (
                     <div className={`rounded-lg p-4 transition-all duration-300 ${message.type === 'success'
-                            ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
-                            : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
+                        ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
+                        : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
                         }`}>
                         <div className="flex items-center">
                             <span className="mr-2 text-xl">{message.type === 'success' ? '✓' : '⚠'}</span>
@@ -190,9 +190,9 @@ export default function ProfilePage() {
                 <div className="grid gap-8 md:grid-cols-3">
                     {/* Left Column: Personal Info (Wider) */}
                     <div className="md:col-span-2 space-y-6">
-                        <form onSubmit={handleProfileUpdate} className="rounded-xl bg-white p-6 shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                        <form onSubmit={handleProfileUpdate} className="rounded-xl bg-[var(--color-bg-card)] p-6 shadow-sm border border-[var(--color-border-light)]">
                             <div className="mb-6 flex items-center justify-between">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">General Information</h2>
+                                <h2 className="text-lg font-semibold text-[var(--color-text-title)]">General Information</h2>
                                 <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
                                     ${profile.role === 'admin'
                                         ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
@@ -205,68 +205,68 @@ export default function ProfilePage() {
                                 {/* Email & Role Row */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-[var(--color-text-body)] flex items-center gap-2">
                                             Email Account
                                         </label>
                                         <input
                                             type="text"
                                             value={profile.username}
                                             disabled
-                                            className="w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                            className="w-full cursor-not-allowed rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] px-4 py-2 text-[var(--color-text-muted)]"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-[var(--color-text-body)] flex items-center gap-2">
                                             Role
                                         </label>
                                         <input
                                             type="text"
                                             value={profile.role?.toUpperCase()}
                                             disabled
-                                            className="w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                            className="w-full cursor-not-allowed rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] px-4 py-2 text-[var(--color-text-muted)]"
                                         />
                                     </div>
                                 </div>
 
                                 {/* Divider */}
-                                <div className="border-t border-gray-100 dark:border-gray-700 my-2"></div>
+                                <div className="border-t border-[var(--color-border-light)] my-2"></div>
 
                                 {/* Editable Fields */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                    <label className="text-sm font-medium text-[var(--color-text-body)] flex items-center gap-2">
                                         <UserCircleIcon className="w-4 h-4" /> Full Name
                                     </label>
                                     <input
                                         type="text"
                                         value={profile.full_name}
                                         onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] px-4 py-2 text-[var(--color-text-body)] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-[var(--color-text-body)] flex items-center gap-2">
                                             <BriefcaseIcon className="w-4 h-4" /> Job Title
                                         </label>
                                         <input
                                             type="text"
                                             value={profile.title}
                                             onChange={(e) => setProfile({ ...profile, title: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] px-4 py-2 text-[var(--color-text-body)] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                                             placeholder="e.g. Manager"
                                         />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-[var(--color-text-body)] flex items-center gap-2">
                                             <IdentificationIcon className="w-4 h-4" /> Employee ID
                                         </label>
                                         <input
                                             type="text"
                                             value={profile.employee_id}
                                             onChange={(e) => setProfile({ ...profile, employee_id: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] px-4 py-2 text-[var(--color-text-body)] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                                             placeholder="e.g. VN12345"
                                         />
                                     </div>
@@ -287,20 +287,20 @@ export default function ProfilePage() {
 
                     {/* Right Column: Security Summary */}
                     <div className="space-y-6">
-                        <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                        <div className="rounded-xl bg-[var(--color-bg-card)] p-6 shadow-sm border border-[var(--color-border-light)]">
                             <div className="mb-4 flex items-center gap-2">
-                                <LockClosedIcon className="h-5 w-5 text-gray-500" />
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Security</h2>
+                                <LockClosedIcon className="h-5 w-5 text-[var(--color-text-muted)]" />
+                                <h2 className="text-lg font-semibold text-[var(--color-text-title)]">Security</h2>
                             </div>
 
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                            <p className="text-sm text-[var(--color-text-muted)] mb-6">
                                 Update your password regularly to keep your account secure.
                             </p>
 
                             <button
                                 type="button"
                                 onClick={openPasswordModal}
-                                className="w-full inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
+                                className="w-full inline-flex items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] px-6 py-2.5 text-sm font-medium text-[var(--color-text-body)] transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                             >
                                 <KeyIcon className="mr-2 h-4 w-4" />
                                 Change Password
@@ -321,16 +321,16 @@ export default function ProfilePage() {
             {/* Change Password Modal */}
             {showPasswordModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                    <div className="bg-[var(--color-bg-card)] rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all border border-[var(--color-border)]">
                         {/* Modal Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-light)]">
+                            <h3 className="text-lg font-semibold text-[var(--color-text-title)] flex items-center gap-2">
                                 <LockClosedIcon className="w-5 h-5 text-red-600" />
                                 Change Password
                             </h3>
                             <button
                                 onClick={() => setShowPasswordModal(false)}
-                                className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-body)] transition-colors"
                             >
                                 <XMarkIcon className="w-6 h-6" />
                             </button>
@@ -340,8 +340,8 @@ export default function ProfilePage() {
                         <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
                             {modalMessage && (
                                 <div className={`rounded-lg p-3 text-sm ${modalMessage.type === 'success'
-                                        ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-300'
-                                        : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300'
+                                    ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-300'
+                                    : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300'
                                     }`}>
                                     {modalMessage.text}
                                 </div>
@@ -349,40 +349,40 @@ export default function ProfilePage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <label className="text-sm font-medium text-[var(--color-text-body)]">
                                         Current Password
                                     </label>
                                     <input
                                         type="password"
                                         value={passwords.currentPassword}
                                         onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        className="w-full rounded-lg border border-[var(--color-border)] px-4 py-2 text-[var(--color-text-body)] bg-[var(--color-bg-card)] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                                         required
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <label className="text-sm font-medium text-[var(--color-text-body)]">
                                         New Password
                                     </label>
                                     <input
                                         type="password"
                                         value={passwords.newPassword}
                                         onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        className="w-full rounded-lg border border-[var(--color-border)] px-4 py-2 text-[var(--color-text-body)] bg-[var(--color-bg-card)] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                                         required
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <label className="text-sm font-medium text-[var(--color-text-body)]">
                                         Confirm New Password
                                     </label>
                                     <input
                                         type="password"
                                         value={passwords.confirmPassword}
                                         onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        className="w-full rounded-lg border border-[var(--color-border)] px-4 py-2 text-[var(--color-text-body)] bg-[var(--color-bg-card)] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                                         required
                                     />
                                 </div>
@@ -392,7 +392,7 @@ export default function ProfilePage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPasswordModal(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-body)] bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                 >
                                     Cancel
                                 </button>

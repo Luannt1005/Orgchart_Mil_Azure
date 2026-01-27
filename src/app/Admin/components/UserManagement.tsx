@@ -198,12 +198,12 @@ export default function UserManagement() {
     };
 
     return (
-        <div className="h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="h-full flex flex-col bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-[var(--color-border-light)] overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex items-center justify-between p-4 border-b border-[var(--color-border-light)] bg-[var(--color-bg-page)]">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-700">All Accounts</span>
-                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    <span className="text-sm font-semibold text-[var(--color-text-title)]">All Accounts</span>
+                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
                         {filteredUsers.length}
                     </span>
                 </div>
@@ -217,17 +217,17 @@ export default function UserManagement() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 flex flex-col min-h-0 bg-[var(--color-bg-card)]">
                 {/* Search */}
-                <div className="p-3 border-b border-gray-100">
+                <div className="p-3 border-b border-[var(--color-border-light)]">
                     <div className="relative">
-                        <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <MagnifyingGlassIcon className="w-4 h-4 text-[var(--color-text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                             type="text"
                             placeholder="Search by name or username..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                            className="w-full pl-9 pr-3 py-2 bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-body)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-[var(--color-text-muted)]"
                         />
                     </div>
                 </div>
@@ -235,36 +235,36 @@ export default function UserManagement() {
                 {/* Table */}
                 <div className="flex-1 overflow-auto">
                     {loading ? (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+                        <div className="h-full flex flex-col items-center justify-center text-[var(--color-text-muted)] gap-2">
                             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                             <span className="text-xs">Loading accounts...</span>
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50 sticky top-0 z-10">
+                            <thead className="bg-[var(--color-bg-page)] sticky top-0 z-10">
                                 <tr>
-                                    <th className="py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">User</th>
-                                    <th className="py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">Username</th>
-                                    <th className="py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">Role</th>
-                                    <th className="py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 text-right">Actions</th>
+                                    <th className="py-3 px-4 text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider border-b border-[var(--color-border-light)]">User</th>
+                                    <th className="py-3 px-4 text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider border-b border-[var(--color-border-light)]">Username</th>
+                                    <th className="py-3 px-4 text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider border-b border-[var(--color-border-light)]">Role</th>
+                                    <th className="py-3 px-4 text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider border-b border-[var(--color-border-light)] text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-[var(--color-border-light)]">
                                 {filteredUsers.map((user) => (
-                                    <tr key={user.id} className="group hover:bg-slate-50 transition-colors">
+                                    <tr key={user.id} className="group hover:bg-[var(--color-bg-page)] transition-colors">
                                         <td className="py-3 px-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-700 flex items-center justify-center text-xs font-bold shadow-sm border border-indigo-50">
+                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-700 flex items-center justify-center text-xs font-bold shadow-sm border border-indigo-50 dark:from-indigo-900 dark:to-purple-900 dark:text-indigo-300 dark:border-indigo-800">
                                                     {user.full_name.charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="text-sm font-medium text-gray-900">{user.full_name}</span>
+                                                <span className="text-sm font-medium text-[var(--color-text-title)]">{user.full_name}</span>
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 text-sm text-gray-600">{user.username}</td>
+                                        <td className="py-3 px-4 text-sm text-[var(--color-text-body)]">{user.username}</td>
                                         <td className="py-3 px-4">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize border ${user.role === 'admin'
-                                                ? 'bg-purple-50 text-purple-700 border-purple-100'
-                                                : 'bg-green-50 text-green-700 border-green-100'
+                                                ? 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800'
+                                                : 'bg-green-50 text-green-700 border-green-100 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
                                                 }`}>
                                                 {user.role || 'user'}
                                             </span>
@@ -273,14 +273,14 @@ export default function UserManagement() {
                                             <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleEditClick(user)}
-                                                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-[var(--color-text-muted)] hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                                                     title="Edit"
                                                 >
                                                     <PencilSquareIcon className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteUser(user)}
-                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-[var(--color-text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                                     title="Delete"
                                                 >
                                                     <TrashIcon className="w-4 h-4" />
@@ -291,7 +291,7 @@ export default function UserManagement() {
                                 ))}
                                 {filteredUsers.length === 0 && (
                                     <tr>
-                                        <td colSpan={4} className="py-12 text-center text-gray-400 text-sm">
+                                        <td colSpan={4} className="py-12 text-center text-[var(--color-text-muted)] text-sm">
                                             No users found.
                                         </td>
                                     </tr>
@@ -305,29 +305,29 @@ export default function UserManagement() {
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="text-lg font-bold text-gray-900">
+                    <div className="bg-[var(--color-bg-card)] rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-[var(--color-border)]">
+                        <div className="px-6 py-4 border-b border-[var(--color-border-light)] flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-[var(--color-text-title)]">
                                 {modalMode === 'add' ? 'New Account' : 'Edit Account'}
                             </h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                            <button onClick={() => setIsModalOpen(false)} className="text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]">
                                 <span className="text-2xl">×</span>
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {error && (
-                                <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100">
+                                <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800">
                                     {error}
                                 </div>
                             )}
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-700">Full Name</label>
+                                <label className="text-xs font-semibold text-[var(--color-text-body)]">Full Name</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    className="w-full px-3 py-2 bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-body)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                     value={formData.full_name}
                                     onChange={e => setFormData({ ...formData, full_name: e.target.value })}
                                 />
@@ -335,11 +335,11 @@ export default function UserManagement() {
 
                             {modalMode === 'add' && (
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-700">Username</label>
+                                    <label className="text-xs font-semibold text-[var(--color-text-body)]">Username</label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-3 py-2 bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-body)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                         value={formData.username}
                                         onChange={e => setFormData({ ...formData, username: e.target.value })}
                                     />
@@ -347,13 +347,13 @@ export default function UserManagement() {
                             )}
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-700">
+                                <label className="text-xs font-semibold text-[var(--color-text-body)]">
                                     {modalMode === 'add' ? 'Password' : 'New Password (optional)'}
                                 </label>
                                 <input
                                     type="password"
                                     required={modalMode === 'add'}
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    className="w-full px-3 py-2 bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-body)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
                                     placeholder={modalMode === 'edit' ? "Leave blank to keep current" : ""}
@@ -361,9 +361,9 @@ export default function UserManagement() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-700">Role</label>
+                                <label className="text-xs font-semibold text-[var(--color-text-body)]">Role</label>
                                 <select
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    className="w-full px-3 py-2 bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-body)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                     value={formData.role}
                                     onChange={e => setFormData({ ...formData, role: e.target.value })}
                                 >
@@ -376,7 +376,7 @@ export default function UserManagement() {
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-body)] bg-[var(--color-bg-page)] hover:bg-[var(--color-border-light)] rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>

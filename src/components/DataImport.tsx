@@ -13,8 +13,12 @@ import { supabase } from "@/lib/supabase";
 
 type ImportTab = 'excel' | 'images';
 
-export default function DataImport() {
-    const [activeTab, setActiveTab] = useState<ImportTab>('excel');
+interface DataImportProps {
+    mode?: 'excel' | 'images' | 'both';
+}
+
+export default function DataImport({ mode = 'both' }: DataImportProps) {
+    const [activeTab, setActiveTab] = useState<ImportTab>(mode === 'excel' ? 'excel' : mode === 'images' ? 'images' : 'excel');
 
     // Excel State
     const [file, setFile] = useState<File | null>(null);
@@ -214,28 +218,30 @@ export default function DataImport() {
         <div className="h-full bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-6">
 
             {/* Tabs */}
-            <div className="flex border-b border-gray-200 mb-6">
-                <button
-                    onClick={() => setActiveTab('excel')}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'excel'
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <TableCellsIcon className="w-5 h-5" />
-                    Excel Data
-                </button>
-                <button
-                    onClick={() => setActiveTab('images')}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'images'
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <PhotoIcon className="w-5 h-5" />
-                    Employee Images
-                </button>
-            </div>
+            {mode === 'both' && (
+                <div className="flex border-b border-gray-200 mb-6">
+                    <button
+                        onClick={() => setActiveTab('excel')}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'excel'
+                            ? 'border-blue-600 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        <TableCellsIcon className="w-5 h-5" />
+                        Excel Data
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('images')}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'images'
+                            ? 'border-blue-600 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        <PhotoIcon className="w-5 h-5" />
+                        Employee Images
+                    </button>
+                </div>
+            )}
 
             {/* EXCEL TAB */}
             {activeTab === 'excel' && (

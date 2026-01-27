@@ -142,6 +142,17 @@
   vertical-align: middle;
 }
 
+/* Dark mode overrides for better visibility */
+:global(.dark) .table th {
+  color: #e2e8f0;
+  /* Slate 200 - Brighter headers */
+}
+
+:global(.dark) .table td {
+  color: #f8fafc;
+  /* Slate 50 - Brighter body text */
+}
+
 .table tbody tr:last-child td {
   border-bottom: none;
 }
