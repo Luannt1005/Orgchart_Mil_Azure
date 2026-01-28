@@ -215,6 +215,15 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
 
     patchOrgChartTemplates();
 
+    // Cleanup existing chart if it exists to prevent duplicates
+    if (chartRef.current) {
+      // If the library supports destroy, call it. Otherwise clear the container.
+      // Assuming chartRef.current.destroy() might not exist based on typical OrgChartJS behavior, 
+      // but checking if we need to completely reset.
+      // Actually, reusing the instance is better performance-wise as per line 235.
+      // However, if we are getting "removeChild" errors, it might be due to React unmounting/remounting too fast.
+    }
+
 
 
     const chartNodes = nodes.map((n: any) => ({
@@ -437,6 +446,18 @@ export default function OrgChartView({ selectedGroup, selectedType }: OrgChartPr
     chartRef.current = chart;
     chart.load(chartNodes);
     console.log("OrgChart initialized from Orgchart_data collection");
+
+    // Cleanup function
+    return () => {
+      // If the library has a destroy method, usage would be chart.destroy();
+      // Since OrgChart JS often attaches to the DOM, clearing the ref might be enough, 
+      // but explicitly setting innerHTML to empty string in the parent can ensure no lingering events if the library doesn't clean up well.
+      // However, be careful not to break the ref for the next mount.
+      chartRef.current = null;
+      if (treeRef.current) {
+        treeRef.current.innerHTML = "";
+      }
+    };
   }, [nodes, loading]);
 
   // Show loading screen while data is loading

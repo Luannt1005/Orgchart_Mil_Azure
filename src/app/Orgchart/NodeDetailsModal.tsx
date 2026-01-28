@@ -118,7 +118,7 @@ export default function NodeDetailsModal({
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white dark:bg-slate-800 p-0 text-left align-middle shadow-2xl transition-all">
+                            <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-[var(--color-bg-card)] p-0 text-left align-middle shadow-2xl transition-all border border-[var(--color-border)]">
 
                                 {/* Header / Banner Background */}
                                 <div className="h-32 bg-gradient-to-r from-[#DB011C] to-[#8f0012] relative overflow-hidden">
@@ -143,7 +143,7 @@ export default function NodeDetailsModal({
                                 <div className="px-8 pb-8">
                                     {/* Profile Image - Overlapping Header */}
                                     <div className="relative -mt-16 mb-4 flex justify-center z-10">
-                                        <div className="h-32 w-32 rounded-full border-4 border-white dark:border-slate-700 shadow-lg overflow-hidden bg-white dark:bg-slate-700">
+                                        <div className="h-32 w-32 rounded-full border-4 border-[var(--color-bg-card)] shadow-lg overflow-hidden bg-[var(--color-bg-card)]">
                                             {nodeData.img ? (
                                                 <img
                                                     src={nodeData.img}
@@ -151,7 +151,7 @@ export default function NodeDetailsModal({
                                                     className="h-full w-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="h-full w-full flex items-center justify-center bg-slate-100 dark:bg-slate-600 text-slate-400 dark:text-slate-300">
+                                                <div className="h-full w-full flex items-center justify-center bg-[var(--color-bg-page)] text-[var(--color-text-muted)]">
                                                     <svg className="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
                                                         <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
                                                     </svg>
@@ -162,19 +162,19 @@ export default function NodeDetailsModal({
 
                                     {/* Main Info */}
                                     <div className="text-center mb-6">
-                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                                        <h3 className="text-2xl font-bold text-[var(--color-text-title)] leading-tight">
                                             {nodeData.name || "Unnamed"}
                                         </h3>
                                         <p className="text-sm font-semibold text-[#DB011C] uppercase tracking-wide mt-1">
                                             {nodeData.title || "No Title"}
                                         </p>
-                                        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+                                        <p className="text-sm text-[var(--color-text-muted)] mt-1">
                                             {nodeData.dept || "No Department"}
                                         </p>
                                     </div>
 
                                     {/* Divider */}
-                                    <div className="h-px bg-gray-100 dark:bg-slate-700 w-full mb-6"></div>
+                                    <div className="h-px bg-[var(--color-border)] w-full mb-6"></div>
 
                                     {/* HEADCOUNT STATS TAGS - NEW SECTION */}
 
@@ -183,35 +183,35 @@ export default function NodeDetailsModal({
                                     <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
 
                                         <div className="col-span-2 sm:col-span-1">
-                                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Employee ID</p>
-                                            <p className="font-medium text-gray-800 dark:text-slate-200 break-all">{nodeData.id}</p>
+                                            <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Employee ID</p>
+                                            <p className="font-medium text-[var(--color-text-body)] break-all">{nodeData.id}</p>
                                         </div>
 
                                         <div className="col-span-2 sm:col-span-1">
-                                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Business Unit</p>
-                                            <p className="font-medium text-gray-800 dark:text-slate-200">{nodeData.BU || "-"}</p>
+                                            <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Business Unit</p>
+                                            <p className="font-medium text-[var(--color-text-body)]">{nodeData.BU || "-"}</p>
                                         </div>
 
                                         {/* NEW FIELD: Employee Type */}
                                         <div className="col-span-2 sm:col-span-1">
-                                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Category</p>
-                                            <p className="font-medium text-gray-800 dark:text-slate-200">{nodeData.type || "-"}</p>
+                                            <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Category</p>
+                                            <p className="font-medium text-[var(--color-text-body)]">{nodeData.type || "-"}</p>
                                         </div>
 
                                         <div className="col-span-2 sm:col-span-1">
-                                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Location</p>
-                                            <p className="font-medium text-gray-800 dark:text-slate-200">{nodeData.location || "-"}</p>
+                                            <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Location</p>
+                                            <p className="font-medium text-[var(--color-text-body)]">{nodeData.location || "-"}</p>
                                         </div>
 
                                         <div className="col-span-2 sm:col-span-1">
-                                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Joining Date</p>
-                                            <p className="font-medium text-gray-800 dark:text-slate-200">{nodeData.joiningDate || "-"}</p>
+                                            <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Joining Date</p>
+                                            <p className="font-medium text-[var(--color-text-body)]">{nodeData.joiningDate || "-"}</p>
                                         </div>
 
                                         {nodeData.description && (
                                             <div className="col-span-2 mt-2">
-                                                <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Description</p>
-                                                <div className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-gray-600 dark:text-slate-300 text-sm leading-relaxed">
+                                                <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Description</p>
+                                                <div className="p-3 bg-[var(--color-bg-page)] rounded-lg text-[var(--color-text-body)] text-sm leading-relaxed border border-[var(--color-border)]">
                                                     {nodeData.description}
                                                 </div>
                                             </div>
@@ -221,7 +221,7 @@ export default function NodeDetailsModal({
                                             <div className="col-span-2 mt-2">
                                                 <div className="flex flex-wrap gap-2">
                                                     {nodeData.tags.map((tag: string, index: number) => (
-                                                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200">
+                                                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-bg-page)] text-[var(--color-text-muted)] border border-[var(--color-border)]">
                                                             {tag}
                                                         </span>
                                                     ))}
@@ -232,36 +232,36 @@ export default function NodeDetailsModal({
 
                                     {/* HEADCOUNT STATS TAGS - Moved to bottom */}
                                     {stats && stats.total > 0 && (
-                                        <div className="mt-8 border-t border-gray-100 dark:border-slate-700 pt-6">
-                                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3 text-center">Span of Control ({stats.total})</p>
+                                        <div className="mt-8 border-t border-[var(--color-border)] pt-6">
+                                            <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-3 text-center">Span of Control ({stats.total})</p>
                                             <div className="flex flex-wrap justify-center gap-2">
                                                 {stats.director > 0 && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-[var(--color-text-body)] border border-purple-200 dark:border-purple-800">
                                                         Director: {stats.director}
                                                     </span>
                                                 )}
                                                 {stats.manager > 0 && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-[var(--color-text-body)] border border-blue-200 dark:border-blue-800">
                                                         Manager: {stats.manager}
                                                     </span>
                                                 )}
                                                 {stats.supervisor > 0 && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-[var(--color-text-body)] border border-green-200 dark:border-green-800">
                                                         Supervisor: {stats.supervisor}
                                                     </span>
                                                 )}
                                                 {stats.specialist > 0 && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-[var(--color-text-body)] border border-orange-200 dark:border-orange-800">
                                                         Specialist: {stats.specialist}
                                                     </span>
                                                 )}
                                                 {stats.engineer > 0 && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 dark:bg-teal-900/30 text-[var(--color-text-body)] border border-teal-200 dark:border-teal-800">
                                                         Engineer: {stats.engineer}
                                                     </span>
                                                 )}
                                                 {stats.idl > 0 && (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-slate-600">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--color-bg-page)] text-[var(--color-text-body)] border border-[var(--color-border)]">
                                                         IDL: {stats.idl}
                                                     </span>
                                                 )}

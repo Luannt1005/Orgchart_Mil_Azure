@@ -59,7 +59,7 @@ export default function Sidebar() {
         {
             title: 'Management',
             items: [
-                { name: 'Edit Table HR', path: '/SheetManager', icon: TableCellsIcon },
+                { name: 'Headcount Management', path: '/SheetManager', icon: TableCellsIcon },
                 { name: 'Headcount Open', path: '/Headcount_open', icon: UserGroupIcon },
                 { name: 'Import Images', path: '/Import_HR_Data', icon: CloudArrowUpIcon },
             ]

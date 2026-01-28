@@ -12,6 +12,11 @@
   --color-primary-light: #FEE2E2;
   --color-primary-dark: #991B1B;
 
+  /* Milwaukee Brand Colors */
+  --color-primary-mwk: #bd011c;
+  --color-primary-mwk-dark: #8a010f;
+  --color-primary-mwk-light: #f8f9fa;
+
   --color-bg-page: #F5F7FA;
   --color-bg-card: #FFFFFF;
   --color-border: #E5E7EB;
@@ -232,9 +237,9 @@
   /* High contrast text for Dark Mode */
   --color-text-title: #FFFFFF;
   --color-text-body: #ffffff;
-  /* Zinc 400 */
-  --color-text-muted: #64748B;
-  --color-text-light: #475569;
+  /* Zinc 300/200 for better visibility */
+  --color-text-muted: #CBD5E1;
+  --color-text-light: #E2E8F0;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);

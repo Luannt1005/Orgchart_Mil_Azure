@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAuthenticated, unauthorizedResponse } from "@/lib/auth-server";
 
 /**
  * GET /api/users
  * Fetch all users ordered by full_name
  */
 export async function GET() {
+    if (!await isAuthenticated()) {
+        return unauthorizedResponse();
+    }
     try {
         const { data, error } = await supabaseAdmin
             .from('users')

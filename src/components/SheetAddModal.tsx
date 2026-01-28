@@ -62,22 +62,22 @@ export default function SheetAddModal({ isOpen, onClose, onSave, columns }: Shee
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+            <div className="w-full max-w-2xl bg-[var(--color-bg-card)] rounded-2xl shadow-2xl ring-1 ring-black/5 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 border border-[var(--color-border)]">
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50 rounded-t-2xl">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-bg-page)] rounded-t-2xl">
                     <div className="flex items-center gap-2">
-                        <div className="p-2 bg-indigo-100 rounded-lg">
-                            <UserPlusIcon className="w-5 h-5 text-indigo-600" />
+                        <div className="p-2 bg-[var(--color-primary-mwk-light)] rounded-lg">
+                            <UserPlusIcon className="w-5 h-5 text-[var(--color-primary-mwk)]" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">Add New Employee</h3>
-                            <p className="text-xs text-gray-500">Enter employee details below</p>
+                            <h3 className="text-lg font-bold text-[var(--color-text-title)]">Add New Employee</h3>
+                            <p className="text-xs text-[var(--color-text-muted)]">Enter employee details below</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-text-body)] hover:bg-[var(--color-bg-card)] rounded-full transition-colors"
                     >
                         <XMarkIcon className="w-6 h-6" />
                     </button>
@@ -101,14 +101,14 @@ export default function SheetAddModal({ isOpen, onClose, onSave, columns }: Shee
 
                             return (
                                 <div key={col} className="space-y-1.5">
-                                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                    <label className="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide">
                                         {label} {col === 'Emp ID' && <span className="text-red-500">*</span>}
                                     </label>
                                     {inputType === 'select' ? (
                                         <select
                                             value={formData[col] || ''}
                                             onChange={(e) => handleChange(col, e.target.value)}
-                                            className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm text-gray-800"
+                                            className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] focus:bg-[var(--color-bg-card)] focus:border-[var(--color-primary-mwk)] focus:ring-2 focus:ring-[var(--color-primary-mwk-light)] outline-none transition-all text-sm text-[var(--color-text-body)]"
                                         >
                                             <option value="">Select {label}</option>
                                             {col === 'DL/IDL/Staff' && (
@@ -136,7 +136,7 @@ export default function SheetAddModal({ isOpen, onClose, onSave, columns }: Shee
                                             type={inputType}
                                             value={formData[col] || ''}
                                             onChange={(e) => handleChange(col, e.target.value)}
-                                            className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm text-gray-800 placeholder:text-gray-400"
+                                            className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] focus:bg-[var(--color-bg-card)] focus:border-[var(--color-primary-mwk)] focus:ring-2 focus:ring-[var(--color-primary-mwk-light)] outline-none transition-all text-sm text-[var(--color-text-body)] placeholder:text-[var(--color-text-muted)]"
                                             placeholder={`Enter ${label}`}
                                             required={col === 'Emp ID'}
                                         />
@@ -148,11 +148,11 @@ export default function SheetAddModal({ isOpen, onClose, onSave, columns }: Shee
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl flex justify-end gap-3">
+                <div className="px-6 py-4 border-t border-[var(--color-border)] bg-[var(--color-bg-page)] rounded-b-2xl flex justify-end gap-3">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-gray-800 transition-colors"
+                        className="px-4 py-2 text-sm font-semibold text-[var(--color-text-muted)] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-page)] hover:text-[var(--color-text-body)] transition-colors"
                     >
                         Cancel
                     </button>
@@ -160,7 +160,7 @@ export default function SheetAddModal({ isOpen, onClose, onSave, columns }: Shee
                         type="submit"
                         form="add-employee-form"
                         disabled={loading}
-                        className="px-5 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm shadow-indigo-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-5 py-2 text-sm font-bold text-white bg-[var(--color-primary-mwk)] rounded-lg hover:bg-[var(--color-primary-mwk-dark)] shadow-sm transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {loading ? (
                             <>

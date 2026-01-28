@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedData } from "@/lib/cache";
+import { isAuthenticated, unauthorizedResponse } from "@/lib/auth-server";
 
 // Cache TTL: 15 minutes for orgchart data
 const ORGCHART_CACHE_TTL = 15 * 60 * 1000;
@@ -86,6 +87,9 @@ const isProbationPeriod = (joiningDateStr: string): boolean => {
  * Fetch employees directly and transform to orgchart nodes on-the-fly.
  */
 export async function GET(req: Request) {
+  if (!await isAuthenticated()) {
+    return unauthorizedResponse();
+  }
   try {
     const { searchParams } = new URL(req.url);
     const dept = searchParams.get("dept");

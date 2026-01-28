@@ -131,26 +131,26 @@ const getStatusColor = (value: string, type: string) => {
   const v = String(value).toLowerCase().trim();
 
   if (type === 'dl_idl') {
-    if (v === 'dl') return 'bg-blue-100 text-blue-700 border-blue-200';
-    if (v === 'idl') return 'bg-purple-100 text-purple-700 border-purple-200';
-    if (v === 'staff') return 'bg-amber-100 text-amber-700 border-amber-200';
-    return 'bg-gray-100 text-gray-700 border-gray-200';
+    if (v === 'dl') return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-800';
+    if (v === 'idl') return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:border-purple-800';
+    if (v === 'staff') return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-800';
+    return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
   }
 
   if (type === 'status') {
-    if (v.includes('active')) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-    if (v.includes('resign')) return 'bg-red-100 text-red-700 border-red-200';
-    if (v.includes('maternity')) return 'bg-pink-100 text-pink-700 border-pink-200';
-    return 'bg-gray-100 text-gray-700 border-gray-200';
+    if (v.includes('active')) return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-300 dark:border-emerald-800';
+    if (v.includes('resign')) return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800';
+    if (v.includes('maternity')) return 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/50 dark:text-pink-300 dark:border-pink-800';
+    return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
   }
 
   if (type === 'emp_type') {
-    if (v.includes('official')) return 'bg-indigo-100 text-indigo-700 border-indigo-200';
-    if (v.includes('probation')) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    return 'bg-slate-100 text-slate-700 border-slate-200';
+    if (v.includes('official')) return 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-800';
+    if (v.includes('probation')) return 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-800';
+    return 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
   }
 
-  return 'bg-gray-50 text-gray-600 border-gray-100';
+  return 'bg-gray-50 text-gray-600 border-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700';
 };
 
 const formatDateToISO = (value: string): string => {
@@ -884,7 +884,7 @@ const SheetManager = ({
                             {/* Avatar for FullName */}
                             {header === "FullName " && (
                               <div
-                                className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden border border-gray-200 bg-gray-50 shadow-sm relative group cursor-pointer"
+                                className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg-page)] shadow-sm relative group cursor-pointer"
                                 onClick={(e) => handleAvatarClick(e, row.id)}
                                 title="Click to change photo"
                               >
@@ -914,20 +914,20 @@ const SheetManager = ({
                                   {String(row[header] || "")}
                                 </span>
                               ) : (
-                                <span className={`block truncate ${header === "FullName " ? "font-medium text-gray-900" : "text-gray-700"}`}>
+                                <span className={`block truncate ${header === "FullName " ? "font-semibold text-[var(--color-text-title)]" : ""}`}>
                                   {DATE_COLUMNS.includes(header) ? formatDate(row[header]) : String(row[header] || "")}
                                 </span>
                               )}
 
                               {/* Pending Review Info */}
                               {isPending && (
-                                <div className="mt-1 p-1 bg-amber-50 rounded border border-amber-100 inline-block">
-                                  <span className="text-[10px] text-amber-700 font-bold flex items-center gap-1">
+                                <div className="mt-1 p-1 bg-amber-50 dark:bg-amber-900/30 rounded border border-amber-100 dark:border-amber-800 inline-block">
+                                  <span className="text-[10px] text-amber-700 dark:text-amber-300 font-bold flex items-center gap-1">
                                     <ArrowPathIcon className="w-3 h-3 animate-spin" />
                                     → {row.pendingLineManager}
                                   </span>
                                   {row.requester && (
-                                    <span className="text-[9px] text-gray-500 italic block mt-0.5 px-0.5">
+                                    <span className="text-[9px] text-[var(--color-text-muted)] italic block mt-0.5 px-0.5">
                                       by {row.requester}
                                     </span>
                                   )}
@@ -947,7 +947,7 @@ const SheetManager = ({
                           <button
                             onClick={() => handleApprovalAction(row.id, 'approve')}
                             disabled={saving}
-                            className="p-1 text-green-500 hover:bg-green-50 rounded"
+                            className="p-1 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/50 rounded"
                             title="Approve"
                           >
                             <CheckCircleIcon className="w-4 h-4" />
@@ -955,7 +955,7 @@ const SheetManager = ({
                           <button
                             onClick={() => handleApprovalAction(row.id, 'reject')}
                             disabled={saving}
-                            className="p-1 text-orange-500 hover:bg-orange-50 rounded"
+                            className="p-1 text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/50 rounded"
                             title="Reject"
                           >
                             <NoSymbolIcon className="w-4 h-4" />
@@ -968,7 +968,7 @@ const SheetManager = ({
                           handleDeleteRow(row.id, row['FullName '] || row.id);
                         }}
                         disabled={saving}
-                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                        className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 rounded transition-colors"
                         title="Delete Employee"
                       >
                         <TrashIcon className="w-4 h-4" />
@@ -979,7 +979,7 @@ const SheetManager = ({
               ))}
               {filteredRows.length === 0 && (
                 <tr>
-                  <td colSpan={headers.length + 1} className="text-center py-8 text-gray-500">
+                  <td colSpan={headers.length + 1} className="text-center py-8 text-[var(--color-text-muted)]">
                     No records found
                   </td>
                 </tr>
@@ -992,37 +992,37 @@ const SheetManager = ({
           <div className="flex items-center justify-between px-4">
             <div className={styles.toolbarInfo}>
               Showing <strong>{filteredRows.length}</strong> of <strong>{ITEMS_PER_PAGE}</strong> per page
-              {totalRecords > 0 && <span className="ml-2 text-gray-500">({totalRecords} total)</span>}
+              {totalRecords > 0 && <span className="ml-2 text-[var(--color-text-muted)]">({totalRecords} total)</span>}
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => goToPage(1)}
                 disabled={currentPage === 1}
-                className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
+                className="p-1.5 border border-[var(--color-border)] rounded disabled:opacity-30 hover:bg-[var(--color-bg-page)] text-[var(--color-text-body)]"
               >
                 <ChevronDoubleLeftIcon className="w-4 h-4" />
               </button>
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
+                className="p-1.5 border border-[var(--color-border)] rounded disabled:opacity-30 hover:bg-[var(--color-bg-page)] text-[var(--color-text-body)]"
               >
                 <ChevronLeftIcon className="w-4 h-4" />
               </button>
-              <span className="px-3 py-1 bg-gray-100 rounded font-medium">
+              <span className="px-3 py-1 bg-[var(--color-bg-page)] rounded font-medium text-[var(--color-text-body)] border border-[var(--color-border)]">
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
+                className="p-1.5 border border-[var(--color-border)] rounded disabled:opacity-30 hover:bg-[var(--color-bg-page)] text-[var(--color-text-body)]"
               >
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
               <button
                 onClick={() => goToPage(totalPages)}
                 disabled={currentPage >= totalPages}
-                className="p-1.5 border rounded disabled:opacity-30 hover:bg-gray-100"
+                className="p-1.5 border border-[var(--color-border)] rounded disabled:opacity-30 hover:bg-[var(--color-bg-page)] text-[var(--color-text-body)]"
               >
                 <ChevronDoubleRightIcon className="w-4 h-4" />
               </button>
@@ -1035,7 +1035,7 @@ const SheetManager = ({
       {
         confirmModal.show && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in fade-in zoom-in duration-200">
+            <div className="bg-[var(--color-bg-card)] rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-in fade-in zoom-in duration-200 border border-[var(--color-border)]">
               <div className="flex items-center gap-3 mb-4">
                 {confirmModal.type === 'approve' ? (
                   <div className="p-3 bg-green-100 rounded-full">
@@ -1046,12 +1046,12 @@ const SheetManager = ({
                     <NoSymbolIcon className="w-6 h-6 text-orange-600" />
                   </div>
                 )}
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-[var(--color-text-title)]">
                   {confirmModal.type === 'approve' ? 'Approve All Changes' : 'Reject All Changes'}
                 </h3>
               </div>
 
-              <p className="text-gray-600 mb-6">
+              <p className="text-[var(--color-text-muted)] mb-6">
                 {confirmModal.type === 'approve'
                   ? `Are you sure you want to approve all ${confirmModal.count} pending changes? This will apply the new Line Manager values.`
                   : `Are you sure you want to reject all ${confirmModal.count} pending changes? The original Line Manager values will be kept.`
@@ -1061,7 +1061,7 @@ const SheetManager = ({
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setConfirmModal({ show: false, type: null, count: 0 })}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-[var(--color-text-body)] hover:text-[var(--color-text-title)] hover:bg-[var(--color-bg-page)] rounded-lg transition-colors border border-[var(--color-border)]"
                 >
                   Cancel
                 </button>

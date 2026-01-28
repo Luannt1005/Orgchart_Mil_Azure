@@ -147,7 +147,7 @@ export function patchOrgChartTemplates(enableEditFeatures = false) {
 `;
 
   OrgChart.templates.big.link =
-    '<path stroke-linejoin="round" stroke="#000" stroke-width="2px" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
+    '<path stroke-linejoin="round" stroke="var(--color-org-line)" stroke-width="2px" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
   // ------------------------------
   // Hide "up" button
   // ------------------------------
@@ -198,7 +198,7 @@ export function patchOrgChartTemplates(enableEditFeatures = false) {
   `;
 
   OrgChart.templates.group.link =
-    '<path stroke-linejoin="round" stroke="#000" stroke-width="2px" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
+    '<path stroke-linejoin="round" stroke="var(--color-org-line)" stroke-width="2px" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
 
   OrgChart.templates.group.nodeMenuButton = "";
   OrgChart.templates.group.up = '';
@@ -277,8 +277,3 @@ export function patchOrgChartTemplates(enableEditFeatures = false) {
   OrgChart.templates.indirect_group.link =
     '<path stroke-linejoin="round" stroke="#1e90ff" stroke-width="4px" stroke-dasharray="10" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
 }
-
-
-
-
-

@@ -115,10 +115,10 @@ export default function EditNodeModal({
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-slate-800 p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[var(--color-bg-card)] p-6 text-left align-middle shadow-xl transition-all border border-[var(--color-border)]">
                                 <Dialog.Title
                                     as="h3"
-                                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4"
+                                    className="text-lg font-medium leading-6 text-[var(--color-text-title)] mb-4"
                                 >
                                     Edit Node Details
                                 </Dialog.Title>
@@ -127,39 +127,39 @@ export default function EditNodeModal({
                                     {/* ID Field */}
                                     {!isDepartment && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Employee ID / Node ID</label>
+                                            <label className="block text-sm font-medium text-[var(--color-text-body)]">Employee ID / Node ID</label>
                                             <input
                                                 type="text"
                                                 name="id"
                                                 value={formData.id || ''}
                                                 onChange={handleChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm border p-2"
+                                                className="mt-1 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-body)] shadow-sm focus:border-[var(--color-primary-mwk)] focus:ring-[var(--color-primary-mwk-light)] sm:text-sm p-2"
                                             />
                                         </div>
                                     )}
 
                                     {/* Name Field */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Name</label>
+                                        <label className="block text-sm font-medium text-[var(--color-text-body)]">Name</label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={formData.name || ''}
                                             onChange={handleChange}
-                                            className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm border p-2"
+                                            className="mt-1 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-body)] shadow-sm focus:border-[var(--color-primary-mwk)] focus:ring-[var(--color-primary-mwk-light)] sm:text-sm p-2"
                                         />
                                     </div>
 
                                     {/* Title Field */}
                                     {!isDepartment && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Title</label>
+                                            <label className="block text-sm font-medium text-[var(--color-text-body)]">Title</label>
                                             <input
                                                 type="text"
                                                 name="title"
                                                 value={formData.title || ''}
                                                 onChange={handleChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm border p-2"
+                                                className="mt-1 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-body)] shadow-sm focus:border-[var(--color-primary-mwk)] focus:ring-[var(--color-primary-mwk-light)] sm:text-sm p-2"
                                             />
                                         </div>
                                     )}
@@ -167,13 +167,13 @@ export default function EditNodeModal({
                                     {/* Department Field */}
                                     {!isDepartment && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Department</label>
+                                            <label className="block text-sm font-medium text-[var(--color-text-body)]">Department</label>
                                             <input
                                                 type="text"
                                                 name="dept"
                                                 value={formData.dept || ''}
                                                 onChange={handleChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm border p-2"
+                                                className="mt-1 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-body)] shadow-sm focus:border-[var(--color-primary-mwk)] focus:ring-[var(--color-primary-mwk-light)] sm:text-sm p-2"
                                             />
                                         </div>
                                     )}
@@ -181,26 +181,26 @@ export default function EditNodeModal({
                                     {/* Description Field */}
                                     {!isDepartment && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
+                                            <label className="block text-sm font-medium text-[var(--color-text-body)]">Description</label>
                                             <textarea
                                                 name="description"
                                                 value={formData.description || ''}
                                                 onChange={handleChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm border p-2"
+                                                className="mt-1 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-body)] shadow-sm focus:border-[var(--color-primary-mwk)] focus:ring-[var(--color-primary-mwk-light)] sm:text-sm p-2"
                                             />
                                         </div>
                                     )}
 
                                     {/* Tags Field */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Tags (comma separated)</label>
+                                        <label className="block text-sm font-medium text-[var(--color-text-body)]">Tags (comma separated)</label>
                                         <input
                                             type="text"
                                             name="tags"
                                             value={formData.tags || ''}
                                             onChange={handleChange}
                                             placeholder="group, assistant, etc."
-                                            className="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white sm:text-sm border p-2"
+                                            className="mt-1 block w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-body)] shadow-sm focus:border-[var(--color-primary-mwk)] focus:ring-[var(--color-primary-mwk-light)] sm:text-sm p-2"
                                         />
                                     </div>
                                 </div>
@@ -219,14 +219,14 @@ export default function EditNodeModal({
 
                                     <button
                                         type="button"
-                                        className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 dark:bg-slate-600 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-500 focus:outline-none focus:visible:ring-2 focus:visible:ring-gray-500 focus:visible:ring-offset-2"
+                                        className="inline-flex justify-center rounded-md border border-transparent bg-[var(--color-bg-page)] px-4 py-2 text-sm font-medium text-[var(--color-text-title)] hover:bg-[var(--color-border)] focus:outline-none focus:visible:ring-2 focus:visible:ring-gray-500 focus:visible:ring-offset-2"
                                         onClick={onClose}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="button"
-                                        className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:visible:ring-2 focus:visible:ring-indigo-500 focus:visible:ring-offset-2"
+                                        className="inline-flex justify-center rounded-md border border-transparent bg-[var(--color-primary-mwk)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-mwk-dark)] focus:outline-none focus:visible:ring-2 focus:visible:ring-[var(--color-primary-mwk)] focus:visible:ring-offset-2"
                                         onClick={handleSave}
                                     >
                                         Save Changes

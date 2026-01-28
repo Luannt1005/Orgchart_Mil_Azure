@@ -1,14 +1,24 @@
 /* Milwaukee Tool Professional OrgChart Styles - Refined Edition */
 
+/* Define default link color for Light Mode */
 .treeContainer {
+    --color-org-line: #000000;
+
     width: 100%;
     height: 100vh;
-    background-color: #f8f9fa;
+    background-color: var(--color-bg-page);
     /* Subtle Professional Grid */
-    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
     background-size: 30px 30px;
     position: relative;
     overflow: hidden;
+}
+
+:global(.dark) .treeContainer {
+    background-color: var(--color-bg-page) !important;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px) !important;
+    /* Define link color for Dark Mode - Light Gray/White */
+    --color-org-line: #cbd5e1;
 }
 
 /* Depth vignette */
@@ -50,20 +60,20 @@
 
 /* Link Styling */
 .treeContainer :global(path.boc-link) {
-    stroke: #d1d5db;
+    stroke: var(--color-border) !important;
     stroke-width: 1.5px;
     transition: all 0.2s ease;
 }
 
 .treeContainer :global(.boc-node:hover+path.boc-link),
 .treeContainer :global(path.boc-link:hover) {
-    stroke: #DB011C !important;
+    stroke: var(--color-primary-mwk) !important;
     stroke-width: 2.5px !important;
 }
 
 /* Highlight */
 .treeContainer :global([data-node-id].selected rect) {
-    stroke: #DB011C !important;
+    stroke: var(--color-primary-mwk) !important;
     stroke-width: 3px !important;
 }
 
@@ -74,12 +84,11 @@
 
 /* Form Container */
 .treeContainer :global(.boc-edit-form) {
-    background-color: #ffffff !important;
+    background-color: var(--color-bg-card) !important;
     border-radius: 12px !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
     overflow: visible !important;
-    border: 1px solid rgba(229, 231, 235, 1) !important;
-    /* gray-200 */
+    border: 1px solid var(--color-border) !important;
     font-family: 'Inter', sans-serif !important;
     width: 400px !important;
     max-width: 90vw;
@@ -87,7 +96,7 @@
 
 /* Header Section */
 .treeContainer :global(.boc-edit-form-header) {
-    background-color: #DB011C !important;
+    background-color: var(--color-primary-mwk) !important;
     /* Milwaukee Red */
     padding: 30px 24px 90px 24px !important;
     /* Increased top padding to push title down */
@@ -136,13 +145,13 @@
 /* Avatar Image & SVG fixes */
 .treeContainer :global(.boc-edit-form-avatar > img),
 .treeContainer :global(.boc-edit-form-avatar > svg) {
-    border: 6px solid #ffffff !important;
+    border: 6px solid var(--color-bg-card) !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
     border-radius: 50% !important;
     width: 160px !important;
     height: 160px !important;
     object-fit: cover !important;
-    background-color: #fff;
+    background-color: var(--color-bg-card);
     display: block !important;
     box-sizing: border-box !important;
     margin: 0 !important;
@@ -177,7 +186,7 @@
 .treeContainer :global(.boc-edit-form-fields) {
     /* Increased top padding to 135px to clear lower avatar */
     padding: 135px 8px 30px 8px !important;
-    background-color: #ffffff !important;
+    background-color: var(--color-bg-card) !important;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
@@ -192,8 +201,7 @@
 /* Labels */
 .treeContainer :global(.boc-form-field label) {
     display: block !important;
-    color: #4b5563 !important;
-    /* gray-600 */
+    color: var(--color-text-muted) !important;
     font-size: 13px !important;
     font-weight: 700 !important;
     text-transform: uppercase;
@@ -211,8 +219,8 @@
     width: 100% !important;
     background-color: transparent !important;
     border: none !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    color: #111827 !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    color: var(--color-text-title) !important;
     padding: 8px 4px !important;
     border-radius: 0 !important;
     font-size: 16px !important;
@@ -242,7 +250,7 @@
 }
 
 .treeContainer :global(::-webkit-scrollbar-thumb) {
-    background: #d1d5db;
+    background: var(--color-border);
     border-radius: 10px;
 }
 

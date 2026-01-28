@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { supabaseAdmin } from "@/lib/supabase";
 import { invalidateCachePrefix } from "@/lib/cache";
+import { isAuthenticated, unauthorizedResponse, getCurrentUser } from "@/lib/auth-server";
 
 /**
  * Get existing Emp IDs from database
@@ -47,6 +48,12 @@ async function deleteEmployeesByEmpIds(empIdsToDelete: string[]): Promise<number
  * - Deletes employees not in the new file
  */
 export async function POST(req: Request) {
+  if (!await isAuthenticated()) {
+    return unauthorizedResponse();
+  }
+  const currentUser = await getCurrentUser();
+  console.log(`🔐 POST /api/import_excel accessed by: ${currentUser}`);
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;

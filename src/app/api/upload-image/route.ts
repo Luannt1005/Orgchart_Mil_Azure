@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAuthenticated, unauthorizedResponse, getCurrentUser } from "@/lib/auth-server";
 
 export async function POST(req: Request) {
+    if (!await isAuthenticated()) {
+        return unauthorizedResponse();
+    }
+    const currentUser = await getCurrentUser();
+    console.log(`🔐 POST /api/upload-image accessed by: ${currentUser}`);
+
     try {
         const formData = await req.formData();
         const file = formData.get("file") as Blob | null;

@@ -72,8 +72,12 @@
 
 .filterInput:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--color-primary-mwk);
+  box-shadow: 0 0 0 3px rgba(189, 1, 28, 0.15);
+}
+
+.filterInput::placeholder {
+  color: var(--color-text-muted);
 }
 
 .btnReset {
@@ -135,22 +139,15 @@
   white-space: nowrap;
 }
 
+:global(.dark) .table th {
+  color: var(--color-text-title);
+}
+
 .table td {
   padding: 10px 16px;
   border-bottom: 1px solid var(--color-border-light);
   color: var(--color-text-body);
   vertical-align: middle;
-}
-
-/* Dark mode overrides for better visibility */
-:global(.dark) .table th {
-  color: #e2e8f0;
-  /* Slate 200 - Brighter headers */
-}
-
-:global(.dark) .table td {
-  color: #f8fafc;
-  /* Slate 50 - Brighter body text */
 }
 
 .table tbody tr:last-child td {
@@ -190,7 +187,7 @@
 
 .btnCreate {
   padding: 8px 16px;
-  background: #2563eb;
+  background: var(--color-primary-mwk);
   /* Primary blue */
   color: white;
   border: none;
@@ -206,14 +203,14 @@
 }
 
 .btnCreate:hover {
-  background: #1d4ed8;
+  background: var(--color-primary-mwk-dark);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .btnSaveAll {
   padding: 8px 16px;
-  background: #059669;
+  background: var(--color-chart-green);
   /* Emerald Green */
   color: white;
   border: none;
@@ -249,6 +246,11 @@
   padding: 12px 20px;
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-page);
+}
+
+.toolbarInfo {
+  color: var(--color-text-body);
+  font-size: 13px;
 }
 
 /* Spinner & Messages */
@@ -302,7 +304,7 @@
 .cellInput {
   width: 100%;
   padding: 6px 8px;
-  border: 2px solid #3b82f6;
+  border: 2px solid var(--color-primary-mwk);
   border-radius: 4px;
   font-size: 13px;
   color: var(--color-text-title);
@@ -312,4 +314,8 @@
 
 .cellInput:focus {
   outline: none;
+}
+
+.cellInput::placeholder {
+  color: var(--color-text-muted);
 }

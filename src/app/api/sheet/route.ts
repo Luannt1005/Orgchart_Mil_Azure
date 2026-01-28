@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedData, invalidateCachePrefix } from "@/lib/cache";
 
 import { retryOperation } from "@/lib/retry";
+import { isAuthenticated, unauthorizedResponse, getCurrentUser } from "@/lib/auth-server";
 
 // Cache TTL: 15 minutes for employee list
 const EMPLOYEES_CACHE_TTL = 15 * 60 * 1000;
@@ -43,6 +44,9 @@ const FILTER_MAPPING: { [key: string]: string } = {
  * Fetch employees with optional pagination and filtering
  */
 export async function GET(req: Request) {
+  if (!await isAuthenticated()) {
+    return unauthorizedResponse();
+  }
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -258,6 +262,12 @@ export async function GET(req: Request) {
  * POST /api/sheet - Add new employee
  */
 export async function POST(req: Request) {
+  if (!await isAuthenticated()) {
+    return unauthorizedResponse();
+  }
+  const currentUser = await getCurrentUser();
+  console.log(`🔐 POST /api/sheet accessed by: ${currentUser}`);
+
   try {
     const body = await req.json();
     const { action, data } = body;
@@ -463,6 +473,12 @@ export async function POST(req: Request) {
  * PUT /api/sheet - Update employee
  */
 export async function PUT(req: Request) {
+  if (!await isAuthenticated()) {
+    return unauthorizedResponse();
+  }
+  const currentUser = await getCurrentUser();
+  console.log(`🔐 PUT /api/sheet accessed by: ${currentUser}`);
+
   try {
     const body = await req.json();
     const { id, data } = body;
@@ -538,6 +554,12 @@ export async function PUT(req: Request) {
  * DELETE /api/sheet - Delete employee
  */
 export async function DELETE(req: Request) {
+  if (!await isAuthenticated()) {
+    return unauthorizedResponse();
+  }
+  const currentUser = await getCurrentUser();
+  console.log(`🔐 DELETE /api/sheet accessed by: ${currentUser}`);
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
