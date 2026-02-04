@@ -70,11 +70,11 @@ const BUOrg3Chart: React.FC<BUOrg3ChartProps> = ({ className, nodes, loading = f
             </div>
 
             {/* Chart */}
-            <div className="flex-1 min-h-[300px]">
+            <div className="flex-1 min-h-0">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={chartData}
-                        margin={{ top: 5, right: 10, left: 10, bottom: 40 }} // Increased bottom margin
+                        margin={{ top: 5, right: 10, left: 10, bottom: 60 }} // Increased bottom margin
                     >
                         <defs>
                             <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">

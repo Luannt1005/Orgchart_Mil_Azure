@@ -44,7 +44,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, count, loading, onClick, isA
         <button
             onClick={onClick}
             className={`
-                h-[72px] w-full bg-[var(--color-bg-card)] rounded-lg shadow-sm
+                min-h-[72px] h-auto py-2 w-full bg-[var(--color-bg-card)] rounded-lg shadow-sm
                 flex flex-col items-center justify-center gap-0.5
                 transition-all duration-200 cursor-pointer
                 border
@@ -59,7 +59,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, count, loading, onClick, isA
                 {count.toLocaleString()}
             </div>
             {/* Label - Small uppercase */}
-            <div className="text-[10px] font-medium text-muted uppercase tracking-wide text-center px-1 truncate max-w-full">
+            <div className="text-[10px] font-medium text-muted uppercase tracking-wide text-center px-1 leading-tight line-clamp-2 max-w-full">
                 {title}
             </div>
         </button>

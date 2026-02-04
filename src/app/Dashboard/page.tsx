@@ -287,16 +287,16 @@ export default function DashboardPage() {
             </header>
 
             {/* ===== MAIN CONTENT (fills remaining height) ===== */}
-            <main className="flex-1 layout-background min-h-0 p-2">
-                <div className="h-full grid grid-cols-12 gap-4">
+            <main className="flex-1 layout-background min-h-0 p-2 pb-1 overflow-y-auto bg-[var(--color-bg-page)]">
+                <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-2 auto-rows-min lg:auto-rows-auto">
 
                     {/* ===== LEFT COLUMN (7 cols) ===== */}
-                    <div className="col-span-7 flex flex-col gap-4 min-h-0">
+                    <div className="lg:col-span-7 flex flex-col gap-2 min-h-0">
 
                         {/* Row 1: KPI Cards (fixed height) */}
                         <div className="shrink-0 min-h-[74px]">
                             <StatsCards
-                                className="grid grid-cols-7 gap-3"
+                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-3"
                                 onFilterChange={handleFilterChange}
                                 activeFilter={legacyActiveFilterState}
                                 nodes={dashboardNodes} // Keep using dashboardNodes to show overview stats
@@ -306,7 +306,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Row 2: Charts (Donut + Seniority) */}
-                        <div className="flex-[0.4] grid grid-cols-2 gap-4">
+                        <div className="lg:flex-[0.4] grid grid-cols-1 sm:grid-cols-2 gap-2 h-[300px] lg:h-0 min-h-[220px]">
                             <DonutChart
                                 onFilterChange={handleFilterChange}
                                 nodes={filteredDashboardNodes} // Apply filters
@@ -320,7 +320,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Row 3: BU Org Chart */}
-                        <div className="flex-[0.6]">
+                        <div className="lg:flex-[0.6] h-[300px] lg:h-0 min-h-[220px]">
                             <BUOrg3Chart
                                 nodes={filteredDashboardNodes} // Apply filters
                                 loading={nodesLoading}
@@ -329,10 +329,10 @@ export default function DashboardPage() {
                     </div>
 
                     {/* ===== RIGHT COLUMN (5 cols) ===== */}
-                    <div className="col-span-5 flex flex-col gap-4 min-h-0 h-full">
+                    <div className="lg:col-span-5 flex flex-col gap-2 min-h-0 h-full">
 
                         {/* Employee Table (main) */}
-                        <div className="flex-[2] min-h-0 bg-white dark:bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-gray-100 dark:border-[var(--color-border-light)] flex flex-col overflow-hidden">
+                        <div className="flex-[2] min-h-[400px] lg:min-h-0 bg-white dark:bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-gray-100 dark:border-[var(--color-border-light)] flex flex-col overflow-hidden">
                             <div className="px-4 pt-3 pb-2 shrink-0 flex items-center justify-between">
                                 <h2 className="text-[13px] font-bold text-title">
                                     Employee Roster
@@ -362,7 +362,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Upcoming Resignations */}
-                        <div className="flex-[1] min-h-0 bg-white dark:bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-gray-100 dark:border-[var(--color-border-light)] flex flex-col overflow-hidden">
+                        <div className="flex-[1] min-h-[250px] lg:min-h-0 bg-white dark:bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-gray-100 dark:border-[var(--color-border-light)] flex flex-col overflow-hidden">
                             <div className="px-4 pt-3 pb-2 shrink-0">
                                 <h2 className="text-[13px] pl-1 font-bold text-title">
                                     Upcoming Resignations

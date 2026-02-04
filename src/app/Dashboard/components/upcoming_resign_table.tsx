@@ -65,34 +65,73 @@ const UpcomingResignTable: React.FC<UpcomingResignTableProps> = ({ className, no
         return parts.join(' ');
     };
 
+    // Helper to find value by flexible key matching
+    const getValue = (obj: any, keys: string[]) => {
+        if (!obj) return '';
+        // 1. Try exact matches
+        for (const key of keys) {
+            if (obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== '') {
+                return obj[key];
+            }
+        }
+        // 2. Try case-insensitive/normalized matches
+        const objKeys = Object.keys(obj);
+        const normalizedKeys = keys.map(k => k.toLowerCase().replace(/[\s\r\n_]/g, ''));
+
+        for (const objKey of objKeys) {
+            const normalizedObjKey = objKey.toLowerCase().replace(/[\s\r\n_]/g, '');
+            if (normalizedKeys.includes(normalizedObjKey)) {
+                const val = obj[objKey];
+                if (val !== undefined && val !== null && String(val).trim() !== '') {
+                    return val;
+                }
+            }
+        }
+        return '';
+    };
+
     // Filter employees with Last Working Day
     const resigningEmployees = useMemo(() => {
         if (!nodes || nodes.length === 0) return [];
 
         return nodes
             .filter((node: any) => {
-                const lastWorkingDay = node['Last Working\r\nDay'] ||
-                    node['Last Working Day'] ||
-                    node['last_working_day'] ||
-                    node['last working day'];
+                const lastWorkingDay = getValue(node, [
+                    'Last Working\r\nDay',
+                    'Last Working Day',
+                    'last_working_day',
+                    'last working day',
+                    'LWD',
+                    'Resignation Date'
+                ]);
                 return lastWorkingDay && String(lastWorkingDay).trim() !== '';
             })
             .map((node: any) => {
-                const lastWorkingDay = node['Last Working\r\nDay'] ||
-                    node['Last Working Day'] ||
-                    node['last_working_day'] ||
-                    node['last working day'] || '';
+                const lastWorkingDay = getValue(node, [
+                    'Last Working\r\nDay',
+                    'Last Working Day',
+                    'last_working_day',
+                    'last working day',
+                    'LWD',
+                    'Resignation Date'
+                ]);
 
-                const joiningDate = node['Joining\r\n Date'] || node['Joining Date'] || node['joining_date'] || '';
+                const joiningDate = getValue(node, [
+                    'Joining\r\n Date',
+                    'Joining Date',
+                    'joining_date',
+                    'joining date',
+                    'Join Date'
+                ]);
 
                 return {
-                    empId: node['Employee ID'] || node['Emp ID'] || node['emp_id'] || '',
-                    fullName: node['Full Name'] || node['Name'] || node['FullName '] || node['FullName'] || node['full_name'] || '',
-                    jobTitle: node['Job Title'] || node['job_title'] || '',
-                    dept: node['BU Org 3'] || node['Department'] || node['Dept'] || node['bu_org_3'] || '',
+                    empId: getValue(node, ['Employee ID', 'Emp ID', 'emp_id', 'id']),
+                    fullName: getValue(node, ['Full Name', 'Name', 'FullName ', 'FullName', 'full_name']),
+                    jobTitle: getValue(node, ['Job Title', 'job_title', 'Title', 'title']),
+                    dept: getValue(node, ['BU Org 3', 'Department', 'Dept', 'bu_org_3']),
                     lastWorkingDay: lastWorkingDay,
                     seniority: calculateSeniority(joiningDate, lastWorkingDay),
-                    imageUrl: `https://raw.githubusercontent.com/Luannt1005/test-images/main/${node['Emp ID'] || node['Employee ID'] || node['emp_id'] || ''}.jpg`
+                    imageUrl: `https://raw.githubusercontent.com/Luannt1005/test-images/main/${getValue(node, ['Employee ID', 'Emp ID', 'emp_id'])}.jpg`
                 };
             })
             .sort((a, b) => {

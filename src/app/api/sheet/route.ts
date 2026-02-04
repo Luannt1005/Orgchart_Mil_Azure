@@ -179,7 +179,7 @@ export async function GET(req: Request) {
 
       const response = NextResponse.json({
         success: true,
-        headers: ["id", "Emp ID", "FullName ", "Job Title", "Dept", "BU", "DL/IDL/Staff", "Location", "Employee Type", "Line Manager", "Is Direct", "Joining\r\n Date"],
+        headers: ["id", "Emp ID", "FullName ", "Job Title", "Dept", "BU", "DL/IDL/Staff", "Location", "Employee Type", "Line Manager", "Is Direct", "Joining\r\n Date", "Last Working\r\nDay"],
         data: transformedEmployees,
         page,
         limit,
@@ -232,7 +232,7 @@ export async function GET(req: Request) {
         console.log(`✅ Loaded ${transformedEmployees.length} employees`);
         return {
           employees: transformedEmployees,
-          headers: ["id", "Emp ID", "FullName ", "Job Title", "Dept", "BU", "DL/IDL/Staff", "Location", "Employee Type", "Line Manager", "Is Direct", "Joining\r\n Date"]
+          headers: ["id", "Emp ID", "FullName ", "Job Title", "Dept", "BU", "DL/IDL/Staff", "Location", "Employee Type", "Line Manager", "Is Direct", "Joining\r\n Date", "Last Working\r\nDay"]
         };
       },
       EMPLOYEES_CACHE_TTL

@@ -159,7 +159,7 @@ const SeniorityChart: React.FC<SeniorityChartProps> = ({ className, onFilterChan
 
             {/* Chart */}
             {/* Chart */}
-            <div className="flex-1 min-h-[300px]">
+            <div className="flex-1 min-h-0">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={chartData}

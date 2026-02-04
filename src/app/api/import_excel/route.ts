@@ -112,9 +112,9 @@ export async function POST(req: Request) {
       deletedCount = await deleteEmployeesByEmpIds(empIdsToDelete);
     }
 
-    // Prepare new employees for insert (skip existing)
+    // Separate new vs existing employees
     const employeesToInsert: any[] = [];
-    let skippedCount = 0;
+    const employeesToUpdate: any[] = [];
 
     rows.forEach((row: any) => {
       const rawId = row["Emp ID"];
@@ -122,39 +122,65 @@ export async function POST(req: Request) {
 
       const empId = String(rawId).trim();
 
-      // Skip if Emp ID already exists
-      if (existingEmpIds.has(empId)) {
-        skippedCount++;
-        return;
-      }
+      // Look for any variation of Last Working Day
+      const lastWorkingDay =
+        row["Last Working\r\nDay"] ||
+        row["Last Working Day"] ||
+        row["Last Working\r\n Day"] ||
+        row["last_working_day"] ||
+        row["Resignation Date"] ||
+        row["LWD"] ||
+        null;
 
-      // Insert all employee data into proper database columns
-      employeesToInsert.push({
-        emp_id: empId,
-        full_name: row["FullName "] || row["FullName"] || null,
-        job_title: row["Job Title"] || null,
-        dept: row["Dept"] || null,
-        bu: row["BU"] || null,
-        bu_org_3: row["BU Org 3"] || row["BU Org 3 "] || null,
-        dl_idl_staff: row["DL/IDL/Staff"] || null,
-        location: row["Location"] || null,
-        employee_type: row["Employee Type"] || null,
-        line_manager: row["Line Manager"] || null,
-        joining_date: row["Joining\r\n Date"] || row["Joining Date"] || null,
-        last_working_day: row["Last Working\r\nDay"] || row["Last Working Day"] || row["Last Working\r\n Day"] || null
-      });
+      const dbId = existingEmpIds.get(empId);
+
+      if (dbId) {
+        // EXSITING: Only update specific columns (per user request)
+        employeesToUpdate.push({
+          emp_id: empId,
+          // Only update these fields
+          job_title: row["Job Title"] || null,
+          last_working_day: lastWorkingDay
+        });
+      } else {
+        // NEW: Insert full record
+        employeesToInsert.push({
+          emp_id: empId,
+          full_name: row["FullName "] || row["FullName"] || null,
+          job_title: row["Job Title"] || null,
+          dept: row["Dept"] || null,
+          bu: row["BU"] || null,
+          bu_org_3: row["BU Org 3"] || row["BU Org 3 "] || null,
+          dl_idl_staff: row["DL/IDL/Staff"] || null,
+          location: row["Location"] || null,
+          employee_type: row["Employee Type"] || null,
+          line_manager: row["Line Manager"] || null,
+          joining_date: row["Joining\r\n Date"] || row["Joining Date"] || null,
+          last_working_day: lastWorkingDay
+        });
+      }
     });
 
-    // Batch insert new employees
     let savedCount = 0;
+
+    // 1. Insert New Employees
     if (employeesToInsert.length > 0) {
-      // Supabase handles large inserts efficiently
       const { error } = await supabaseAdmin
         .from('employees')
         .insert(employeesToInsert);
 
       if (error) throw error;
-      savedCount = employeesToInsert.length;
+      savedCount += employeesToInsert.length;
+    }
+
+    // 2. Update Existing Employees (Partial Update)
+    if (employeesToUpdate.length > 0) {
+      const { error } = await supabaseAdmin
+        .from('employees')
+        .upsert(employeesToUpdate, { onConflict: 'emp_id' }); // Upsert with partial data updates only the specified columns for existing rows
+
+      if (error) throw error;
+      savedCount += employeesToUpdate.length;
     }
 
     // Invalidate cache after import
@@ -163,8 +189,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       total: rows.length,
-      saved: savedCount,
-      skipped: skippedCount,
+      saved: savedCount, // This now represents total upserted (inserted + updated)
       deleted: deletedCount
     });
   } catch (err: any) {
