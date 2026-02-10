@@ -53,40 +53,20 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // 1. Check if username already exists in Supabase
-      const { data: existingUsers, error: queryError } = await supabase
-        .from('users')
-        .select('username')
-        .eq('username', username)
-        .limit(1);
-
-      if (queryError) {
-        console.error("Query error:", queryError);
-        throw new Error("Lỗi kết nối database");
-      }
-
-      if (existingUsers && existingUsers.length > 0) {
-        setError("Tên đăng nhập đã tồn tại");
-        setLoading(false);
-        return;
-      }
-
-      // 2. Hash password
-      const hashedPassword = await hashPassword(password);
-
-      // 3. Insert new user into Supabase
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert({
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           username,
-          password: hashedPassword,
-          full_name: fullName,
-          role: 'user'
-        });
+          password,
+          full_name: fullName
+        })
+      });
 
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        throw new Error("Không thể tạo tài khoản. Vui lòng thử lại.");
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Không thể tạo tài khoản");
       }
 
       // 4. Show success and redirect
@@ -97,13 +77,7 @@ export default function SignupPage() {
 
     } catch (err: any) {
       console.error("Signup error:", err);
-      let msg = "Lỗi kết nối. Vui lòng thử lại.";
-
-      if (err.message) {
-        msg = err.message;
-      }
-
-      setError(msg);
+      setError(err.message || "Lỗi kết nối. Vui lòng thử lại.");
       setLoading(false);
     }
   };

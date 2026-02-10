@@ -1,21 +1,16 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getDbConnection, sql } from '@/lib/db';
 
 /**
- * Health check endpoint to keep Supabase connection alive
- * Prevents database from going into pause state
+ * Health check endpoint to keep Azure SQL connection alive
  */
 export async function GET() {
     try {
-        const { data, error } = await supabaseAdmin
-            .from('employees')
-            .select('id')
-            .limit(1)
-            .single();
+        const pool = await getDbConnection();
+        const result = await pool.request().query("SELECT 1 as status");
 
-        if (error && error.code !== 'PGRST116') {
-            // PGRST116 = no rows, which is OK for health check
-            throw error;
+        if (result.recordset[0].status !== 1) {
+            throw new Error("Database query failed");
         }
 
         return NextResponse.json({

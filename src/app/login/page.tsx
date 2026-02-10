@@ -28,61 +28,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Find user in Supabase by username
-      const { data: users, error: queryError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .limit(1);
-
-      if (queryError) {
-        console.error("Query error:", queryError);
-        throw new Error("Lỗi kết nối database");
-      }
-
-      if (!users || users.length === 0) {
-        setError("Sai tài khoản hoặc mật khẩu");
-        setLoading(false);
-        return;
-      }
-
-      // 2. Get user data
-      const userData = users[0];
-
-      // 3. Verify password with bcrypt
-      const isPasswordValid = await verifyPassword(password, userData.password);
-      if (!isPasswordValid) {
-        setError("Sai tài khoản hoặc mật khẩu");
-        setLoading(false);
-        return;
-      }
-
-      // 4. Create user info object
-      const userInfo = {
-        id: userData.id,
-        username: userData.username,
-        full_name: userData.full_name || userData.username,
-        role: userData.role || "user"
-      };
-
-      // 5. Create session via API
-      const sessionRes = await fetch("/api/create-session", {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: userInfo })
+        body: JSON.stringify({ username, password })
       });
 
-      const sessionData = await sessionRes.json();
+      const data = await res.json();
 
-      if (!sessionData.success) {
-        throw new Error("Failed to create session");
+      if (!data.success) {
+        throw new Error(data.error || "Đăng nhập thất bại");
       }
 
-      // 6. Save user info to localStorage and context for UI
-      // Note: setUser in our context also updates localStorage, but doing it explicitly here first 
-      // doesn't hurt and ensures it's available.
-      // Actually, relying on setUser context is cleaner if available.
-      setUser(userInfo);
+      // 6. Save user info to context for UI
+      setUser(data.user);
 
       // ✅ Show success animation
       setSuccess(true);
@@ -94,13 +53,7 @@ export default function LoginPage() {
 
     } catch (err: any) {
       console.error("Login error:", err);
-      let msg = "Lỗi kết nối. Vui lòng thử lại.";
-
-      if (err.message) {
-        msg = err.message;
-      }
-
-      setError(msg);
+      setError(err.message || "Lỗi kết nối. Vui lòng thử lại.");
       setLoading(false);
     }
   };

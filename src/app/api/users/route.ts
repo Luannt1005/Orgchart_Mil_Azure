@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getDbConnection, sql } from "@/lib/db";
 import { isAuthenticated, unauthorizedResponse } from "@/lib/auth-server";
 
 /**
@@ -11,22 +11,13 @@ export async function GET() {
         return unauthorizedResponse();
     }
     try {
-        const { data, error } = await supabaseAdmin
-            .from('users')
-            .select('id, username, full_name, role, created_at')
-            .order('full_name', { ascending: true });
-
-        if (error) {
-            console.error("Supabase Fetch Users Error:", error);
-            return NextResponse.json({
-                success: false,
-                message: error.message || "Failed to fetch users"
-            }, { status: 500 });
-        }
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .query("SELECT id, username, full_name, role, created_at FROM users ORDER BY full_name ASC");
 
         return NextResponse.json({
             success: true,
-            data: data || []
+            data: result.recordset
         });
     } catch (error: any) {
         console.error("API Fetch Users Error:", error);

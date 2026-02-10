@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getDbConnection, sql } from "@/lib/db";
 import { getCachedData, invalidateCachePrefix } from "@/lib/cache";
 
 import { retryOperation } from "@/lib/retry";
@@ -52,106 +52,73 @@ export async function GET(req: Request) {
     const id = searchParams.get("id");
     const page = parseInt(searchParams.get("page") || "0");
     const limit = parseInt(searchParams.get("limit") || "0");
+    const pool = await getDbConnection();
 
     // ======= SINGLE EMPLOYEE FETCH =======
     if (id) {
-      const { data, error } = await supabaseAdmin
-        .from('employees')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const result = await pool.request()
+        .input('id', sql.UniqueIdentifier, id)
+        .query("SELECT * FROM employees WHERE id = @id");
 
-      if (error || !data) {
+      if (result.recordset.length === 0) {
         return NextResponse.json(
           { success: false, error: "Employee not found" },
           { status: 404 }
         );
       }
 
-      return NextResponse.json({ success: true, data });
+      return NextResponse.json({ success: true, data: result.recordset[0] });
     }
 
     // ======= PAGINATED FETCH =======
     if (page > 0 && limit > 0) {
       const excludedParams = ['page', 'limit', 'id', 'preventCache'];
-
-      // Only include filters that map to valid database columns
       const filters: { [key: string]: string } = {};
+
       searchParams.forEach((value, key) => {
         if (!excludedParams.includes(key) && value.trim() !== '') {
           if (FILTER_MAPPING[key]) {
             filters[key] = value;
-          } else {
-            // Ignore unknown filters silently
-            console.log(`⚠️ Ignoring unknown filter: ${key}=${value}`);
           }
         }
       });
 
       const hasFilters = Object.keys(filters).length > 0;
+      let whereClause = "1=1";
+      const request = pool.request();
 
-      // Build count query
-      let countQuery = supabaseAdmin
-        .from('employees')
-        .select('id', { count: 'exact', head: true });
-
-      Object.entries(filters).forEach(([key, value]) => {
+      Object.entries(filters).forEach(([key, value], index) => {
         const dbColumn = FILTER_MAPPING[key];
         if (dbColumn) {
-          // Use exact match for status columns and enum-like fields, ilike for text search
+          const paramName = `param_${index}`;
           if (dbColumn === 'line_manager_status' || dbColumn === 'dl_idl_staff') {
-            countQuery = countQuery.eq(dbColumn, value);
+            whereClause += ` AND ${dbColumn} = @${paramName}`;
+            request.input(paramName, sql.NVarChar, value);
           } else {
-            countQuery = countQuery.ilike(dbColumn, `%${value}%`);
+            whereClause += ` AND ${dbColumn} LIKE @${paramName}`;
+            request.input(paramName, sql.NVarChar, `%${value}%`);
           }
         }
       });
 
-      const { count: totalCount, error: countError } = await countQuery;
+      // Count query
+      const countResult = await request.query(`SELECT COUNT(*) as count FROM employees WHERE ${whereClause}`);
+      const totalCount = countResult.recordset[0].count;
 
-      if (countError) {
-        console.error("Count error:", countError);
-      }
+      // Data query with pagination
+      const offset = (page - 1) * limit;
+      // Note: ORDER BY is mandatory for OFFSET FETCH
+      const dataResult = await request.query(`
+          SELECT ${LIST_COLUMNS} 
+          FROM employees 
+          WHERE ${whereClause} 
+          ORDER BY full_name ASC 
+          OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY
+      `);
 
-      // Build data query with pagination
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+      const employees = dataResult.recordset;
 
-      let dataQuery = supabaseAdmin
-        .from('employees')
-        .select(LIST_COLUMNS);
-
-      Object.entries(filters).forEach(([key, value]) => {
-        const dbColumn = FILTER_MAPPING[key];
-        if (dbColumn) {
-          // Use exact match for status columns and enum-like fields, ilike for text search
-          if (dbColumn === 'line_manager_status' || dbColumn === 'dl_idl_staff') {
-            dataQuery = dataQuery.eq(dbColumn, value);
-          } else {
-            dataQuery = dataQuery.ilike(dbColumn, `%${value}%`);
-          }
-        }
-      });
-
-      const { data: employees, error: dataError } = await retryOperation(
-        async () => {
-          const result = await dataQuery
-            .range(from, to)
-            .order('full_name', { ascending: true });
-
-          if (result.error) throw result.error;
-          return result;
-        },
-        3, // 3 retries
-        1000 // 1 second initial delay
-      );
-
-      if (dataError) {
-        console.error("Data query error:", dataError);
-        throw dataError;
-      }
-
-      // Transform to match expected format - all data comes from database columns directly
+      // Transform to match expected format
       const transformedEmployees = (employees || []).map(emp => ({
         id: emp.id,
         "Emp ID": emp.emp_id,
@@ -175,7 +142,7 @@ export async function GET(req: Request) {
       const total = totalCount || 0;
       const totalPages = Math.ceil(total / limit);
 
-      console.log(`📄 Page ${page}: ${transformedEmployees.length} records (${from}-${to} of ${total})`);
+      console.log(`📄 Page ${page}: ${transformedEmployees.length} records`);
 
       const response = NextResponse.json({
         success: true,
@@ -201,14 +168,10 @@ export async function GET(req: Request) {
       async () => {
         console.log("📡 Fetching all employees for dashboard...");
 
-        const { data: employees, error } = await supabaseAdmin
-          .from('employees')
-          .select(LIST_COLUMNS)
-          .order('full_name', { ascending: true });
+        const result = await pool.request().query(`SELECT ${LIST_COLUMNS} FROM employees ORDER BY full_name ASC`);
+        const employees = result.recordset;
 
-        if (error) throw error;
-
-        // Transform to match expected format - all data comes from database columns directly
+        // Transform
         const transformedEmployees = (employees || []).map(emp => ({
           id: emp.id,
           "Emp ID": emp.emp_id,
@@ -271,6 +234,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { action, data } = body;
+    const pool = await getDbConnection();
 
     if (!action || !data) {
       return NextResponse.json(
@@ -283,7 +247,6 @@ export async function POST(req: Request) {
       const { quantity, data } = body;
       console.log(`[bulkAddHeadcount] Received data for ${quantity} positions:`, JSON.stringify(data));
 
-
       if (!quantity || typeof quantity !== 'number' || quantity <= 0) {
         return NextResponse.json(
           { success: false, error: "Invalid quantity" },
@@ -292,166 +255,137 @@ export async function POST(req: Request) {
       }
 
       const timestamp = Date.now();
-      const newEmployees = [];
+      let insertedCount = 0;
 
-      for (let i = 0; i < quantity; i++) {
-        // Generate unique ID: HC-TIMESTAMP-INDEX
-        const empId = `HC-${timestamp}-${i + 1}`;
+      const transaction = new sql.Transaction(pool);
+      await transaction.begin();
 
-        newEmployees.push({
-          emp_id: empId,
-          full_name: data["FullName "] || data["FullName"] || "Vacant Position",
-          job_title: data["Job Title"] || null,
-          dept: data["Dept"] || null,
-          bu: data["BU"] || null,
-          bu_org_3: data["BU Org 3"] || null,
-          dl_idl_staff: data["DL/IDL/Staff"] || null,
-          location: data["Location"] || null,
-          employee_type: 'hc_open', // Force hc_open
-          line_manager: data["Line Manager"] || null,
-          is_direct: data["Is Direct"] || "YES",
-          joining_date: data["Joining\r\n Date"] || data["Joining Date"] || null,
-          last_working_day: data["Last Working\r\nDay"] || data["Last Working Day"] || null
-        });
+      try {
+        for (let i = 0; i < quantity; i++) {
+          const empId = `HC-${timestamp}-${i + 1}`;
+          // Use request from transaction
+          await transaction.request()
+            .input('emp_id', sql.NVarChar, empId)
+            .input('full_name', sql.NVarChar, data["FullName "] || data["FullName"] || "Vacant Position")
+            .input('job_title', sql.NVarChar, data["Job Title"] || null)
+            .input('dept', sql.NVarChar, data["Dept"] || null)
+            .input('bu', sql.NVarChar, data["BU"] || null)
+            .input('bu_org_3', sql.NVarChar, data["BU Org 3"] || null)
+            .input('dl_idl_staff', sql.NVarChar, data["DL/IDL/Staff"] || null)
+            .input('location', sql.NVarChar, data["Location"] || null)
+            // .input('employee_type', sql.NVarChar, 'hc_open') // Defined below
+            .input('line_manager', sql.NVarChar, data["Line Manager"] || null)
+            .input('is_direct', sql.NVarChar, data["Is Direct"] || "YES")
+            .input('joining_date', sql.NVarChar, data["Joining\r\n Date"] || data["Joining Date"] || null)
+            .input('last_working_day', sql.NVarChar, data["Last Working\r\nDay"] || data["Last Working Day"] || null)
+            .query(`
+                    INSERT INTO employees (
+                        emp_id, full_name, job_title, dept, bu, dl_idl_staff, location, employee_type, 
+                        line_manager, is_direct, joining_date
+                    ) VALUES (
+                        @emp_id, @full_name, @job_title, @dept, @bu, @dl_idl_staff, @location, 'hc_open',
+                        @line_manager, @is_direct, @joining_date
+                    )
+                `);
+          insertedCount++;
+        }
+        await transaction.commit();
+      } catch (err: any) {
+        await transaction.rollback();
+        throw err;
       }
-
-      const { data: inserted, error } = await supabaseAdmin
-        .from('employees')
-        .insert(newEmployees)
-        .select('id');
-
-      if (error) throw error;
 
       invalidateCachePrefix('employees');
       invalidateCachePrefix('orgchart');
 
       return NextResponse.json({
         success: true,
-        count: inserted ? inserted.length : 0,
-        message: `Successfully added ${inserted ? inserted.length : 0} open headcount positions`
+        count: insertedCount,
+        message: `Successfully added ${insertedCount} open headcount positions`
       });
     }
 
     if (action === "add") {
-      const newEmployee = {
-        emp_id: data["Emp ID"] || `EMP-${Date.now()}`,
-        full_name: data["FullName "] || data["FullName"] || null,
-        job_title: data["Job Title"] || null,
-        dept: data["Dept"] || null,
-        bu: data["BU"] || null,
-        bu_org_3: data["BU Org 3"] || null,
-        dl_idl_staff: data["DL/IDL/Staff"] || null,
-        location: data["Location"] || null,
-        employee_type: data["Employee Type"] || null,
-        line_manager: data["Line Manager"] || null,
-        is_direct: data["Is Direct"] || "YES",
-        joining_date: data["Joining\r\n Date"] || data["Joining Date"] || null,
-        last_working_day: data["Last Working\r\nDay"] || data["Last Working Day"] || null
-      };
+      const emp_id = data["Emp ID"] || `EMP-${Date.now()}`;
 
-      const { data: inserted, error } = await supabaseAdmin
-        .from('employees')
-        .insert(newEmployee)
-        .select('id')
-        .single();
+      const result = await pool.request()
+        .input('emp_id', sql.NVarChar, emp_id)
+        .input('full_name', sql.NVarChar, data["FullName "] || data["FullName"] || null)
+        .input('job_title', sql.NVarChar, data["Job Title"] || null)
+        .input('dept', sql.NVarChar, data["Dept"] || null)
+        .input('bu', sql.NVarChar, data["BU"] || null)
+        .input('dl_idl_staff', sql.NVarChar, data["DL/IDL/Staff"] || null)
+        .input('location', sql.NVarChar, data["Location"] || null)
+        .input('employee_type', sql.NVarChar, data["Employee Type"] || null)
+        .input('line_manager', sql.NVarChar, data["Line Manager"] || null)
+        .input('is_direct', sql.NVarChar, data["Is Direct"] || "YES")
+        .input('joining_date', sql.NVarChar, data["Joining\r\n Date"] || data["Joining Date"] || null)
+        .query(`
+            INSERT INTO employees (
+                emp_id, full_name, job_title, dept, bu, dl_idl_staff, location, employee_type,
+                line_manager, is_direct, joining_date
+            ) OUTPUT INSERTED.id VALUES (
+                @emp_id, @full_name, @job_title, @dept, @bu, @dl_idl_staff, @location, @employee_type,
+                @line_manager, @is_direct, @joining_date
+            )
+        `);
 
-      if (error) throw error;
-
+      const insertedId = result.recordset[0]?.id;
       invalidateCachePrefix('employees');
       invalidateCachePrefix('orgchart');
 
-
-
       return NextResponse.json({
         success: true,
-        id: inserted.id,
+        id: insertedId,
         message: "Employee added successfully"
       });
     }
 
     // Reject all pending approval requests
     if (action === "rejectAll") {
-      const { data: pendingRows, error: fetchError } = await supabaseAdmin
-        .from('employees')
-        .select('id')
-        .eq('line_manager_status', 'pending');
+      const result = await pool.request().query(`
+            UPDATE employees 
+            SET line_manager_status = 'rejected', pending_line_manager = NULL, requester = NULL
+            WHERE line_manager_status = 'pending'
+        `);
 
-      if (fetchError) throw fetchError;
-
-      if (!pendingRows || pendingRows.length === 0) {
-        return NextResponse.json({
-          success: true,
-          count: 0,
-          message: "No pending requests to reject"
-        });
-      }
-
-      const { error: updateError } = await supabaseAdmin
-        .from('employees')
-        .update({
-          line_manager_status: 'rejected',
-          pending_line_manager: null,
-          requester: null
-        })
-        .eq('line_manager_status', 'pending');
-
-      if (updateError) throw updateError;
+      const count = result.rowsAffected[0];
 
       invalidateCachePrefix('employees');
       invalidateCachePrefix('orgchart');
 
-      console.log(`🚫 Rejected ${pendingRows.length} pending requests`);
+      // console.log(`🚫 Rejected ${count} pending requests`);
 
       return NextResponse.json({
         success: true,
-        count: pendingRows.length,
-        message: `Rejected ${pendingRows.length} pending requests`
+        count: count,
+        message: `Rejected ${count} pending requests`
       });
     }
 
     // Approve all pending approval requests
     if (action === "approveAll") {
-      const { data: pendingRows, error: fetchError } = await supabaseAdmin
-        .from('employees')
-        .select('id, pending_line_manager')
-        .eq('line_manager_status', 'pending');
+      // We need to update line_manager to pending_line_manager value
+      const result = await pool.request().query(`
+          UPDATE employees
+          SET line_manager = pending_line_manager,
+              line_manager_status = 'approved',
+              pending_line_manager = NULL,
+              requester = NULL
+          WHERE line_manager_status = 'pending'
+      `);
 
-      if (fetchError) throw fetchError;
-
-      if (!pendingRows || pendingRows.length === 0) {
-        return NextResponse.json({
-          success: true,
-          count: 0,
-          message: "No pending requests to approve"
-        });
-      }
-
-      // Update each record: move pending_line_manager to line_manager
-      let successCount = 0;
-      for (const row of pendingRows) {
-        const { error: updateError } = await supabaseAdmin
-          .from('employees')
-          .update({
-            line_manager: row.pending_line_manager,
-            line_manager_status: 'approved',
-            pending_line_manager: null,
-            requester: null
-          })
-          .eq('id', row.id);
-
-        if (!updateError) successCount++;
-      }
+      const count = result.rowsAffected[0];
 
       invalidateCachePrefix('employees');
       invalidateCachePrefix('orgchart');
 
-      // Trigger OrgChart sync after approving all
-      console.log(`✅ Approved ${successCount} pending requests`);
+      // console.log(`✅ Approved ${count} pending requests`);
 
       return NextResponse.json({
         success: true,
-        count: successCount,
-        message: `Approved ${successCount} pending requests`
+        count: count,
+        message: `Approved ${count} pending requests`
       });
     }
 
@@ -482,6 +416,7 @@ export async function PUT(req: Request) {
   try {
     const body = await req.json();
     const { id, data } = body;
+    const pool = await getDbConnection();
 
     if (!id || !data) {
       return NextResponse.json(
@@ -490,51 +425,76 @@ export async function PUT(req: Request) {
       );
     }
 
-    const updateData: Record<string, any> = {};
+    const request = pool.request();
+    request.input('id', sql.UniqueIdentifier, id); // Assuming ID is GUID
 
-    if (data["Emp ID"]) updateData.emp_id = data["Emp ID"];
-    if (data["FullName "] || data["FullName"]) updateData.full_name = data["FullName "] || data["FullName"];
-    if (data["Job Title"]) updateData.job_title = data["Job Title"];
-    if (data["Dept"]) updateData.dept = data["Dept"];
-    if (data["BU"]) updateData.bu = data["BU"];
-    if (data["BU Org 3"]) updateData.bu_org_3 = data["BU Org 3"];
-    if (data["DL/IDL/Staff"]) updateData.dl_idl_staff = data["DL/IDL/Staff"];
-    if (data["Location"]) updateData.location = data["Location"];
-    if (data["Employee Type"]) updateData.employee_type = data["Employee Type"];
-    if (data["Line Manager"]) updateData.line_manager = data["Line Manager"];
-    if (data["Joining\r\n Date"] || data["Joining Date"]) updateData.joining_date = data["Joining\r\n Date"] || data["Joining Date"];
-    if (data["Last Working\r\nDay"] || data["Last Working Day"]) updateData.last_working_day = data["Last Working\r\nDay"] || data["Last Working Day"];
-    if (data["Is Direct"]) updateData.is_direct = data["Is Direct"];
+    let setClauses = [];
 
-    // Handle approval workflow fields
+    // Map data fields to columns
+    if (data["Emp ID"]) {
+      request.input('emp_id', sql.NVarChar, data["Emp ID"]);
+      setClauses.push("emp_id = @emp_id");
+    }
+    if (data["FullName "] || data["FullName"]) {
+      request.input('full_name', sql.NVarChar, data["FullName "] || data["FullName"]);
+      setClauses.push("full_name = @full_name");
+    }
+    if (data["Job Title"]) {
+      request.input('job_title', sql.NVarChar, data["Job Title"]);
+      setClauses.push("job_title = @job_title");
+    }
+    if (data["Dept"]) {
+      request.input('dept', sql.NVarChar, data["Dept"]);
+      setClauses.push("dept = @dept");
+    }
+    if (data["BU"]) {
+      request.input('bu', sql.NVarChar, data["BU"]);
+      setClauses.push("bu = @bu");
+    }
+    if (data["DL/IDL/Staff"]) {
+      request.input('dl_idl_staff', sql.NVarChar, data["DL/IDL/Staff"]);
+      setClauses.push("dl_idl_staff = @dl_idl_staff");
+    }
+    if (data["Location"]) {
+      request.input('location', sql.NVarChar, data["Location"]);
+      setClauses.push("location = @location");
+    }
+    if (data["Employee Type"]) {
+      request.input('employee_type', sql.NVarChar, data["Employee Type"]);
+      setClauses.push("employee_type = @employee_type");
+    }
+    if (data["Line Manager"]) {
+      request.input('line_manager', sql.NVarChar, data["Line Manager"]);
+      setClauses.push("line_manager = @line_manager");
+    }
+    if (data["Is Direct"]) {
+      request.input('is_direct', sql.NVarChar, data["Is Direct"]);
+      setClauses.push("is_direct = @is_direct");
+    }
+    if (data["Joining\r\n Date"] || data["Joining Date"]) {
+      request.input('joining_date', sql.NVarChar, data["Joining\r\n Date"] || data["Joining Date"]);
+      setClauses.push("joining_date = @joining_date");
+    }
+
     if (data["lineManagerStatus"] !== undefined) {
-      updateData.line_manager_status = data["lineManagerStatus"];
+      request.input('line_manager_status', sql.NVarChar, data["lineManagerStatus"]);
+      setClauses.push("line_manager_status = @line_manager_status");
     }
     if (data["pendingLineManager"] !== undefined) {
-      updateData.pending_line_manager = data["pendingLineManager"];
-    }
-    // Also handle snake_case versions (from direct API calls)
-    if (data["line_manager_status"] !== undefined) {
-      updateData.line_manager_status = data["line_manager_status"];
-    }
-    if (data["pending_line_manager"] !== undefined) {
-      updateData.pending_line_manager = data["pending_line_manager"];
+      request.input('pending_line_manager', sql.NVarChar, data["pendingLineManager"]);
+      setClauses.push("pending_line_manager = @pending_line_manager");
     }
     if (data["requester"] !== undefined) {
-      updateData.requester = data["requester"];
+      request.input('requester', sql.NVarChar, data["requester"]);
+      setClauses.push("requester = @requester");
     }
 
-    const { error } = await supabaseAdmin
-      .from('employees')
-      .update(updateData)
-      .eq('id', id);
-
-    if (error) throw error;
+    if (setClauses.length > 0) {
+      await request.query(`UPDATE employees SET ${setClauses.join(', ')} WHERE id = @id`);
+    }
 
     invalidateCachePrefix('employees');
     invalidateCachePrefix('orgchart');
-
-
 
     return NextResponse.json({
       success: true,
@@ -564,33 +524,23 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const deleteAll = searchParams.get("deleteAll");
+    const pool = await getDbConnection();
 
     // Delete ALL employees
     if (deleteAll === "true") {
-      // First get the count
-      const { count, error: countError } = await supabaseAdmin
-        .from('employees')
-        .select('id', { count: 'exact', head: true });
-
-      if (countError) throw countError;
-
-      // Delete all records
-      const { error: deleteError } = await supabaseAdmin
-        .from('employees')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Workaround to delete all
-
-      if (deleteError) throw deleteError;
+      // Only delete if we need to? Or just truncate? 
+      // Note: TRUNCATE is faster but might require more perms or break FKs if any. 
+      // Using delete with always true.
+      const result = await pool.request().query("DELETE FROM employees");
+      const count = result.rowsAffected[0];
 
       invalidateCachePrefix('employees');
       invalidateCachePrefix('orgchart');
 
-      console.log(`🗑️ Deleted ALL ${count} employees`);
-
       return NextResponse.json({
         success: true,
-        count: count || 0,
-        message: `Deleted all ${count || 0} employees`
+        count: count,
+        message: `Deleted all ${count} employees`
       });
     }
 
@@ -602,12 +552,9 @@ export async function DELETE(req: Request) {
       );
     }
 
-    const { error } = await supabaseAdmin
-      .from('employees')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    await pool.request()
+      .input('id', sql.UniqueIdentifier, id)
+      .query("DELETE FROM employees WHERE id = @id");
 
     invalidateCachePrefix('employees');
     invalidateCachePrefix('orgchart');

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getDbConnection, sql } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
 
 export async function PUT(req: Request) {
@@ -20,14 +20,15 @@ export async function PUT(req: Request) {
             return NextResponse.json({ success: false, message: "Missing fields" }, { status: 400 });
         }
 
-        // Get current password hash
-        const { data: user, error: fetchError } = await supabaseAdmin
-            .from('users')
-            .select('password')
-            .eq('id', userId)
-            .single();
+        const pool = await getDbConnection();
 
-        if (fetchError || !user) throw new Error("User not found");
+        // Get current password hash
+        const result = await pool.request()
+            .input('id', sql.UniqueIdentifier, userId)
+            .query("SELECT password FROM users WHERE id = @id");
+
+        if (result.recordset.length === 0) throw new Error("User not found");
+        const user = result.recordset[0];
 
         const isValid = await verifyPassword(currentPassword, user.password);
         if (!isValid) {
@@ -36,12 +37,10 @@ export async function PUT(req: Request) {
 
         const newHash = await hashPassword(newPassword);
 
-        const { error: updateError } = await supabaseAdmin
-            .from('users')
-            .update({ password: newHash })
-            .eq('id', userId);
-
-        if (updateError) throw updateError;
+        await pool.request()
+            .input('id', sql.UniqueIdentifier, userId)
+            .input('password', sql.NVarChar, newHash)
+            .query("UPDATE users SET password = @password, updated_at = SYSDATETIME() WHERE id = @id");
 
         return NextResponse.json({ success: true, message: "Password updated" });
     } catch (error: any) {

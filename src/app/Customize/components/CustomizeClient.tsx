@@ -58,7 +58,12 @@ const CustomizeClient = () => {
         updateNodeData,
         addDepartment, // Get from hook
         addEmployee,   // Get from hook
+        addDescriptionTable, // Get from hook
         removeNode,    // Get from hook
+
+        descriptionTables,      // EXPOSE THIS
+        descriptionTablesRef,   // EXPOSE THIS
+        setDescriptionTables,   // EXPOSE THIS
 
         loadingChart,
         isSaving,
@@ -167,6 +172,7 @@ const CustomizeClient = () => {
                 isSaving={isSaving}
                 onAddDepartment={() => addDepartment && addDepartment(null)}
                 onAddEmployee={() => addEmployee && addEmployee(null)}
+                onAddDescriptionTable={addDescriptionTable}
             />
 
             {/* ===== MAIN CONTENT ===== */}

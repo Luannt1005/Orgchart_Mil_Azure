@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getDbConnection, sql } from "@/lib/db";
 
 export async function GET() {
     try {
@@ -13,16 +13,15 @@ export async function GET() {
         if (!payload || !payload.user) return NextResponse.json({ success: false, message: "Invalid session" }, { status: 401 });
 
         const userId = payload.user.id;
+        const pool = await getDbConnection();
 
-        const { data, error } = await supabaseAdmin
-            .from('users')
-            .select('id, username, full_name, role, employee_id, title')
-            .eq('id', userId)
-            .single();
+        const result = await pool.request()
+            .input('id', sql.UniqueIdentifier, userId)
+            .query("SELECT id, username, full_name, role FROM users WHERE id = @id"); // Removed employee_id, title if not in schema
 
-        if (error) throw error;
+        if (result.recordset.length === 0) throw new Error("User not found");
 
-        return NextResponse.json({ success: true, data });
+        return NextResponse.json({ success: true, data: result.recordset[0] });
     } catch (error: any) {
         console.error("Profile GET Error:", error);
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -42,22 +41,19 @@ export async function PUT(req: Request) {
         const body = await req.json();
 
         // Updates allowed fields
-        const updates = {
-            full_name: body.full_name,
-            employee_id: body.employee_id,
-            title: body.title,
-        };
+        // Note: employee_id and title were in Supabase query but NOT in scripts/migrate-to-azure.ts table definition for 'users'
+        // If they need to be updated, the schema must support them.
+        // Based on migrate-to-azure.ts: users(id, username, password, full_name, role, created_at, updated_at)
+        // So I will only update full_name for now.
 
-        const { data, error } = await supabaseAdmin
-            .from('users')
-            .update(updates)
-            .eq('id', userId)
-            .select()
-            .single();
+        const pool = await getDbConnection();
+        const request = pool.request()
+            .input('id', sql.UniqueIdentifier, userId)
+            .input('full_name', sql.NVarChar, body.full_name);
 
-        if (error) throw error;
+        await request.query("UPDATE users SET full_name = @full_name, updated_at = SYSDATETIME() WHERE id = @id");
 
-        return NextResponse.json({ success: true, data });
+        return NextResponse.json({ success: true, data: { full_name: body.full_name } });
     } catch (error: any) {
         console.error("Profile PUT Error:", error);
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });

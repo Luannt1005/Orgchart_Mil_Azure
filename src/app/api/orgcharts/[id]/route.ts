@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getDbConnection, sql } from '@/lib/db';
 
 /**
  * GET /api/orgcharts/[id]
@@ -20,29 +20,26 @@ export async function GET(
             );
         }
 
-        const { data, error } = await supabaseAdmin
-            .from('custom_orgcharts')
-            .select('*')
-            .eq('id', id)
-            .single();
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('id', sql.UniqueIdentifier, id)
+            .query("SELECT * FROM custom_orgcharts WHERE id = @id");
 
-        if (error) {
-            if (error.code === 'PGRST116') {
-                // Not found
-                return NextResponse.json({
-                    error: "Orgchart not found",
-                    orgchart_id: id,
-                    org_data: { data: [] }
-                }, { status: 404 });
-            }
-            throw error;
+        if (result.recordset.length === 0) {
+            return NextResponse.json({
+                error: "Orgchart not found",
+                orgchart_id: id,
+                org_data: { data: [] }
+            }, { status: 404 });
         }
+
+        const data = result.recordset[0];
 
         return NextResponse.json({
             orgchart_id: data.id,
             orgchart_name: data.orgchart_name,
             describe: data.description,
-            org_data: data.org_data,
+            org_data: JSON.parse(data.org_data || '{"data": []}'),
             username: data.username,
             created_at: data.created_at,
             updated_at: data.updated_at
@@ -70,20 +67,26 @@ export async function PUT(
         const data = await request.json();
         const { org_data, orgchart_name, describe } = data;
 
-        const updateData: any = {
-            updated_at: new Date().toISOString(),
-        };
+        const pool = await getDbConnection();
+        const requestSql = pool.request();
+        requestSql.input('id', sql.UniqueIdentifier, id);
 
-        if (org_data !== undefined) updateData.org_data = org_data;
-        if (orgchart_name) updateData.orgchart_name = orgchart_name;
-        if (describe !== undefined) updateData.description = describe;
+        let setClauses = ["updated_at = SYSDATETIME()"];
 
-        const { error } = await supabaseAdmin
-            .from('custom_orgcharts')
-            .update(updateData)
-            .eq('id', id);
+        if (org_data !== undefined) {
+            requestSql.input('org_data', sql.NVarChar, JSON.stringify(org_data));
+            setClauses.push("org_data = @org_data");
+        }
+        if (orgchart_name) {
+            requestSql.input('orgchart_name', sql.NVarChar, orgchart_name);
+            setClauses.push("orgchart_name = @orgchart_name");
+        }
+        if (describe !== undefined) {
+            requestSql.input('description', sql.NVarChar, describe);
+            setClauses.push("description = @description");
+        }
 
-        if (error) throw error;
+        await requestSql.query(`UPDATE custom_orgcharts SET ${setClauses.join(', ')} WHERE id = @id`);
 
         return NextResponse.json({
             success: true,
@@ -108,13 +111,11 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
+        const pool = await getDbConnection();
 
-        const { error } = await supabaseAdmin
-            .from('custom_orgcharts')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
+        await pool.request()
+            .input('id', sql.UniqueIdentifier, id)
+            .query("DELETE FROM custom_orgcharts WHERE id = @id");
 
         return NextResponse.json({
             success: true,

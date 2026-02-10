@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getDbConnection, sql } from '@/lib/db';
 
 /**
  * GET /api/orgcharts
@@ -14,18 +14,16 @@ export async function GET(request: Request) {
   }
 
   try {
-    const { data, error } = await supabaseAdmin
-      .from('custom_orgcharts')
-      .select('id, orgchart_name, description, org_data')
-      .eq('username', username);
+    const pool = await getDbConnection();
+    const result = await pool.request()
+      .input('username', sql.NVarChar, username)
+      .query("SELECT id, orgchart_name, description, org_data FROM custom_orgcharts WHERE username = @username");
 
-    if (error) throw error;
-
-    const orgcharts = (data || []).map(doc => ({
+    const orgcharts = (result.recordset || []).map(doc => ({
       orgchart_id: doc.id,
       orgchart_name: doc.orgchart_name,
       describe: doc.description,
-      org_data: doc.org_data,
+      org_data: JSON.parse(doc.org_data || '{"data": []}'), // Parse JSON
     }));
 
     return NextResponse.json({ orgcharts });
@@ -54,22 +52,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: newOrgchart, error } = await supabaseAdmin
-      .from('custom_orgcharts')
-      .insert({
-        username,
-        orgchart_name,
-        description: describe || "",
-        org_data: org_data || { data: [] }
-      })
-      .select()
-      .single();
+    const pool = await getDbConnection();
+    const result = await pool.request()
+      .input('username', sql.NVarChar, username)
+      .input('orgchart_name', sql.NVarChar, orgchart_name)
+      .input('description', sql.NVarChar, describe || "")
+      .input('org_data', sql.NVarChar, JSON.stringify(org_data || { data: [] }))
+      .query(`
+            INSERT INTO custom_orgcharts (username, orgchart_name, description, org_data)
+            OUTPUT INSERTED.id
+            VALUES (@username, @orgchart_name, @description, @org_data)
+        `);
 
-    if (error) throw error;
+    const newOrgchartId = result.recordset[0].id;
 
     return NextResponse.json({
       success: true,
-      orgchart_id: newOrgchart.id,
+      orgchart_id: newOrgchartId,
       message: "Orgchart created successfully"
     });
   } catch (err) {

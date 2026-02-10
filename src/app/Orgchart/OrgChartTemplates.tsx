@@ -276,4 +276,59 @@ export function patchOrgChartTemplates(enableEditFeatures = false) {
 
   OrgChart.templates.indirect_group.link =
     '<path stroke-linejoin="round" stroke="#1e90ff" stroke-width="4px" stroke-dasharray="10" fill="none" d="M{xa},{ya} {xb},{yb} {xc},{yc} L{xd},{yd}" />';
+
+
+  // --- TEMPLATE BIG TABLE (Description Table) ---
+  OrgChart.templates.big_table = Object.assign({}, OrgChart.templates.big);
+  OrgChart.templates.big_table.size = [300, 300];
+  OrgChart.templates.big_table.img_0 = "";
+  OrgChart.templates.big_table.field_0 = "";
+  OrgChart.templates.big_table.field_1 = "";
+
+  // Use dynamic width {w} and height {h}
+  OrgChart.templates.big_table.node = `
+  <rect x="0" y="0" height="{h}" width="{w}"
+        fill="#ffffff"
+        stroke="#E5E7EB"
+        stroke-width="1"
+        filter="url(#mil-shadow)"></rect>
+  <rect x="0" y="0" height="10" width="{w}"
+        fill="#DB011C" class="move-handle" style="cursor: move;"></rect>
+  
+  <!-- Resize Handle (Bottom-Right) -->
+  <g class="resize-handle" style="cursor:nwse-resize" transform="translate({w}, {h})">
+      <path d="M-15,0 L0,0 L0,-15 Z" fill="#999" opacity="0.5" />
+      <line x1="-10" y1="-3" x2="-3" y2="-10" stroke="#fff" stroke-width="1" />
+      <line x1="-6" y1="-3" x2="-3" y2="-6" stroke="#fff" stroke-width="1" />
+  </g>
+  `;
+
+  if (enableEditFeatures) {
+    // OrgChart.templates.big_table.node += MOVE_BUTTONS_SVG; // Disable standard move buttons
+  }
+
+  // The 'table' field will render the HTML content
+  // We need to adjust foreignObject size too: width="{w}-20", height="{h}-30"
+  // BUT standard templating might not support arithmetic in attributes directly unless using specific field mapping.
+  // Balkan OrgChart templates typically use {val} or specific property names.
+  // If {w} and {h} are available, we can try to use them or fixed offsets if SVG allows calc() (it doesn't easily in attributes).
+  // A safe bet is using a slightly smaller inner container or assuming the foreignObject fills the space.
+  // We will assume the user logic updates the 'width'/'height' of foreignObject if possible, 
+  // OR we rely on standard box model. 
+  // Let's try to use width="100%" height="100%" inside a transparent container? 
+  // No, foreignObject needs explicit dimensions.
+  // We'll update the nodeBinding to map 'width' and 'height' if needed, but 'w' and 'h' are internal.
+  // Let's rely on the library filling {w} and {h}.
+  // We might face an issue if we can't do math like {w}-20.
+  // Workaround: We will use a large foreignObject with overflow hidden, or just set it to {w} and {h} and use padding in CSS.
+
+  OrgChart.templates.big_table.table = `
+    <foreignObject x="10" y="20" width="100%" height="100%" style="overflow: visible;">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:{w}px; height:{h}px; padding-right: 20px; padding-bottom: 20px; box-sizing: border-box;">
+             <div style="width: 100%; height: 100%; overflow: auto;">
+                {val}
+             </div>
+        </div>
+    </foreignObject>
+  `;
 }

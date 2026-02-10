@@ -14,6 +14,7 @@ interface CustomizeHeaderProps {
     onSave: () => void;
     onAddDepartment?: () => void; // New
     onAddEmployee?: () => void;   // New
+    onAddDescriptionTable?: () => void; // New
     isSaving: boolean;
 }
 
@@ -30,6 +31,7 @@ export default function CustomizeHeader({
     onSave,
     onAddDepartment,
     onAddEmployee,
+    onAddDescriptionTable,
     isSaving
 }: CustomizeHeaderProps) {
     return (
@@ -130,6 +132,18 @@ export default function CustomizeHeader({
                                         >
                                             <span className="mr-2">👤</span>
                                             Add Employee
+                                        </button>
+                                    )}
+                                </Menu.Item>
+                                <Menu.Item>
+                                    {({ active }) => (
+                                        <button
+                                            onClick={onAddDescriptionTable}
+                                            className={`${active ? 'bg-indigo-50 text-indigo-600' : 'text-gray-900'
+                                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                        >
+                                            <span className="mr-2">📝</span>
+                                            Add Description Table
                                         </button>
                                     )}
                                 </Menu.Item>

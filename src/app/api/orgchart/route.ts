@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getDbConnection, sql } from "@/lib/db";
 import { getCachedData } from "@/lib/cache";
 import { isAuthenticated, unauthorizedResponse } from "@/lib/auth-server";
 
@@ -100,25 +100,19 @@ export async function GET(req: Request) {
     const data = await getCachedData(
       cacheKey,
       async () => {
-        console.log(`📡 [Cache MISS] Fetching employees from Supabase (dept: ${dept || 'all'})...`);
+        console.log(`📡 [Cache MISS] Fetching employees from Azure SQL (dept: ${dept || 'all'})...`);
 
-        // 1. Fetch employees
-        let query = supabaseAdmin
-          .from('employees')
-          .select('*')
-          // Filter out rows without emp_id to maintain data integrity
-          .neq('emp_id', '');
+        const pool = await getDbConnection();
+        const request = pool.request();
+        let queryStr = "SELECT * FROM employees WHERE emp_id IS NOT NULL AND emp_id <> ''";
 
         if (dept && dept !== "all") {
-          query = query.eq('dept', dept);
+          queryStr += " AND dept = @dept";
+          request.input('dept', sql.NVarChar, dept);
         }
 
-        const { data: employees, error } = await query;
-
-        if (error) {
-          console.error("Supabase error:", error);
-          throw error;
-        }
+        const result = await request.query(queryStr);
+        const employees = result.recordset;
 
         if (!employees || employees.length === 0) {
           return [];
@@ -166,7 +160,7 @@ export async function GET(req: Request) {
           // Handle Headcount Open
           if (emp.employee_type === 'hc_open') {
             tags.push("headcount_open");
-            imageUrl = "/headcount_open.png";
+            imageUrl = "/headcount_open.png"; // Assuming local asset
           }
 
           if (joiningDate && isProbationPeriod(joiningDate)) {
