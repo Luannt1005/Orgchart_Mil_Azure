@@ -20,15 +20,17 @@ if (dbServer.includes(',')) {
     port = parseInt(parts[1]);
 }
 
+console.log(`[DB Config] Server: ${server}, Port: ${port}, User: ${dbUser ? '***' : 'missing'}, DB: ${dbName}`);
+
 const config = {
-    user: dbUser,
-    password: dbPassword,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     server: server,
     port: port,
-    database: dbName,
+    database: process.env.DB_NAME,
     options: {
         encrypt: true, // For Azure SQL
-        trustServerCertificate: false, // Change to true for local dev / self-signed certs
+        trustServerCertificate: true, // Change to true for local dev / self-signed certs
         connectTimeout: 30000, // 30 seconds
         requestTimeout: 30000 // 30 seconds
     },
