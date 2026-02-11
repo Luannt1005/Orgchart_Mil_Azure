@@ -1,0 +1,82 @@
+{
+  "depts": [
+    "AME Battery",
+    "AME Motor",
+    "AME Power Tool",
+    "Automation",
+    "EE & Motor Engineering",
+    "EHS",
+    "EHS&ESG",
+    "Engineering - EE",
+    "Engineering - Motor",
+    "Engineering - NPD",
+    "Engineering - PSE",
+    "Engineering - VE",
+    "ESG",
+    "Factory Maintenance Unit",
+    "IDM Control",
+    "IE",
+    "Management",
+    "Manufacturing Excellence, Training & Development",
+    "MC",
+    "MFG Management",
+    "Mitigation & Investigation Force",
+    "Operations Support",
+    "OPEX",
+    "OPM",
+    "PM - Battery",
+    "PM - Motor",
+    "PM - PT",
+    "PMC",
+    "Production - Battery",
+    "Production - DL - Battery",
+    "Production - DL - Motor",
+    "Production - DL - PT",
+    "Production - Motor",
+    "Production - PT",
+    "QM - Advanced Quality Engineering",
+    "QM - Operations Quality - Battery",
+    "QM - Operations Quality - Motor",
+    "QM - Operations Quality - PT",
+    "QM - Parts Quality - IQC",
+    "QM - Parts Quality - Metrology",
+    "QM - Parts Quality - QMS",
+    "QM - Parts Quality - SQE",
+    "QM - Quality Management",
+    "QM - Reliability Engineering",
+    "Test Lab",
+    "Warehouse - Motor & Battery",
+    "Warehouse - PT"
+  ],
+  "testDept": "AME Battery",
+  "employeesCount": 7,
+  "nodesCount": 8,
+  "groupsCount": 1,
+  "rootsCount": 8,
+  "first3Roots": [
+    {
+      "id": "582521",
+      "pid": "543202",
+      "stpid": "dept:AME Battery:543202",
+      "name": "Trần Tâm Trí Minh"
+    },
+    {
+      "id": "616792",
+      "pid": "543202",
+      "stpid": "dept:AME Battery:543202",
+      "name": "Nguyễn Minh Tân"
+    },
+    {
+      "id": "603997",
+      "pid": "543202",
+      "stpid": "dept:AME Battery:543202",
+      "name": "Võ Thanh Tùng"
+    }
+  ],
+  "sampleNode": {
+    "id": "582521",
+    "pid": "543202",
+    "stpid": "dept:AME Battery:543202",
+    "name": "Trần Tâm Trí Minh"
+  }
+}

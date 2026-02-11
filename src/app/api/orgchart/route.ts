@@ -122,6 +122,9 @@ export async function GET(req: Request) {
         const output: any[] = [];
         const deptMap = new Map();
 
+        // 1.5 Create ID Set for lookup
+        const empIds = new Set(employees.map((e: Employee) => trimLeadingZeros(e.emp_id) || ""));
+
         employees.forEach((emp: Employee) => {
           const empId = String(emp.emp_id || "").trim();
           if (!empId) return;
@@ -131,8 +134,8 @@ export async function GET(req: Request) {
           let managerPart = managerRaw ? String(managerRaw).split(":")[0].trim() : null;
 
           let isIndirectManager = false;
-          let managerId = null;
-          let deptManagerId = null;
+          let managerId: string | null = null;
+          let deptManagerId: string | null = null;
 
           if (managerPart) {
             // Logic for indirect managers
@@ -167,10 +170,16 @@ export async function GET(req: Request) {
             tags.push("Emp_probation");
           }
 
+          // Check if manager exists in current dataset
+          const isManagerPresent = managerId && empIds.has(managerId);
+
+          // If manager is missing (filtered out or not in DB), attach to Department Group
+          const effectivePid = isManagerPresent ? managerId : null;
+
           // Create Employee Node
           output.push({
             id: empId,
-            pid: managerId,
+            pid: effectivePid,
             stpid: deptKey,
             name: emp.full_name || "",
             title: emp.job_title || "",
@@ -189,9 +198,15 @@ export async function GET(req: Request) {
         // 3. Add Department Nodes
         deptMap.forEach((v, deptKey) => {
           const deptTags = v.isIndirectManager ? ["indirect_group"] : ["group"];
+
+          // Check if manager is present in the dataset
+          const isManagerPresent = v.managerId && empIds.has(v.managerId);
+          // If manager is missing, this Group Node becomes a Root
+          const effectivePid = isManagerPresent ? v.managerId : null;
+
           output.push({
             id: deptKey,
-            pid: v.managerId,
+            pid: effectivePid,
             stpid: null,
             name: v.dept || "",
             title: "Department",

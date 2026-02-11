@@ -17,13 +17,15 @@ export async function GET(request: Request) {
     const pool = await getDbConnection();
     const result = await pool.request()
       .input('username', sql.NVarChar, username)
-      .query("SELECT id, orgchart_name, description, org_data FROM custom_orgcharts WHERE username = @username");
+      .query("SELECT id, username, orgchart_name, description, org_data, is_public FROM custom_orgcharts WHERE username = @username OR is_public = 1");
 
     const orgcharts = (result.recordset || []).map(doc => ({
       orgchart_id: doc.id,
       orgchart_name: doc.orgchart_name,
       describe: doc.description,
       org_data: JSON.parse(doc.org_data || '{"data": []}'), // Parse JSON
+      is_public: doc.is_public || false,
+      username: doc.username,
     }));
 
     return NextResponse.json({ orgcharts });
@@ -43,7 +45,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { username, orgchart_name, describe, org_data } = data;
+    const { username, orgchart_name, describe, org_data, is_public } = data;
 
     if (!username || !orgchart_name) {
       return NextResponse.json(
@@ -58,10 +60,11 @@ export async function POST(request: Request) {
       .input('orgchart_name', sql.NVarChar, orgchart_name)
       .input('description', sql.NVarChar, describe || "")
       .input('org_data', sql.NVarChar, JSON.stringify(org_data || { data: [] }))
+      .input('is_public', sql.Bit, is_public ? 1 : 0)
       .query(`
-            INSERT INTO custom_orgcharts (username, orgchart_name, description, org_data)
+            INSERT INTO custom_orgcharts (username, orgchart_name, description, org_data, is_public)
             OUTPUT INSERTED.id
-            VALUES (@username, @orgchart_name, @description, @org_data)
+            VALUES (@username, @orgchart_name, @description, @org_data, @is_public)
         `);
 
     const newOrgchartId = result.recordset[0].id;

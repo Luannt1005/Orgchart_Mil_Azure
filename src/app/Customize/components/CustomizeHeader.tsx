@@ -16,6 +16,8 @@ interface CustomizeHeaderProps {
     onAddEmployee?: () => void;   // New
     onAddDescriptionTable?: () => void; // New
     isSaving: boolean;
+    isPublic: boolean;
+    onTogglePublic: (val: boolean) => void;
 }
 
 export default function CustomizeHeader({
@@ -32,33 +34,33 @@ export default function CustomizeHeader({
     onAddDepartment,
     onAddEmployee,
     onAddDescriptionTable,
-    isSaving
+    isSaving,
+    isPublic,
+    onTogglePublic
 }: CustomizeHeaderProps) {
     return (
         <header className="z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
             {/* Left: Title & Profile Selector */}
             <div className="flex items-center gap-6">
-                <div className="flex flex-col">
-                    <h1 className="text-lg font-bold text-slate-800 leading-tight">Customize Org Chart</h1>
-                    <p className="text-[11px] font-medium text-slate-500">Design & Edit Structures</p>
-                </div>
+                <button
+                    onClick={() => setOrgId("")}
+                    className="flex items-center gap-2 p-2 -ml-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <div className="flex flex-col items-start">
+                        <h1 className="text-sm font-bold text-slate-800 leading-tight">Back to Folders</h1>
+                    </div>
+                </button>
 
                 <div className="h-8 w-px bg-slate-200"></div>
 
                 <div className="flex flex-col">
-                    <label className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Current Profile</label>
-                    <select
-                        value={orgId}
-                        onChange={(e) => setOrgId(e.target.value)}
-                        className="h-9 min-w-[240px] rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 outline-none transition-all hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    >
-                        <option value="">-- Select a Profile --</option>
-                        {orgList.map((org) => (
-                            <option key={org.orgchart_id} value={org.orgchart_id}>
-                                {org.orgchart_name}
-                            </option>
-                        ))}
-                    </select>
+                    <label className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Editing Chart</label>
+                    <div className="flex h-9 min-w-[240px] items-center rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700">
+                        {orgList.find(o => o.orgchart_id === orgId)?.orgchart_name || "Untitled Chart"}
+                    </div>
                 </div>
             </div>
 
@@ -154,28 +156,29 @@ export default function CustomizeHeader({
 
                 <div className="h-8 w-px bg-slate-200 mx-1"></div>
 
-                {/* DELETE */}
-                <button
-                    onClick={onDelete}
-                    disabled={!orgId}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-500 transition-colors hover:border-red-200 hover:bg-red-100 disabled:opacity-40"
-                    title="Delete Profile"
-                >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
 
-                {/* NEW PROFILE */}
-                <button
-                    onClick={onOpenCreateModal}
-                    className="flex h-9 items-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-all active:scale-95"
-                >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    New
-                </button>
+
+
+
+                <div className="h-8 w-px bg-slate-200 mx-1"></div>
+
+                {/* PUBLIC TOGGLE */}
+                <div className="flex items-center gap-2 mr-2">
+                    <span className={`text-xs font-semibold ${isPublic ? "text-indigo-600" : "text-slate-500"}`}>
+                        {isPublic ? "Public" : "Private"}
+                    </span>
+                    <button
+                        onClick={() => onTogglePublic(!isPublic)}
+                        disabled={!orgId}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${isPublic ? 'bg-indigo-600' : 'bg-slate-200'
+                            }`}
+                    >
+                        <span
+                            className={`${isPublic ? 'translate-x-6' : 'translate-x-1'
+                                } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                        />
+                    </button>
+                </div>
 
                 {/* SAVE */}
                 <button

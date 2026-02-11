@@ -5,6 +5,7 @@ export interface OrgProfile {
     orgchart_id: string;
     orgchart_name: string;
     created_at: string;
+    is_public?: boolean;
     // add other fields as seen in the API response
     [key: string]: any;
 }
@@ -17,7 +18,7 @@ export function useOrgProfileManager({ user }: UseOrgProfileManagerProps) {
     const [orgList, setOrgList] = useState<OrgProfile[]>([]);
     const [loadingList, setLoadingList] = useState(true);
 
-    const username = user?.username;
+    const username = user?.username || "admin";
 
     /* ================= LOAD USER'S CUSTOM ORGCHARTS ================= */
     const fetchOrgList = useCallback(async () => {

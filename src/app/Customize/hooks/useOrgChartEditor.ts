@@ -17,6 +17,7 @@ export function useOrgChartEditor(
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaveTime, setLastSaveTime] = useState<string | null>(null);
     const [hasChanges, setHasChanges] = useState(false);
+    const [isPublic, setIsPublic] = useState(false); // NEW STATE
 
     // NEW: Separate State for Description Tables
     const [descriptionTables, setDescriptionTables] = useState<any[]>([]);
@@ -354,16 +355,23 @@ export function useOrgChartEditor(
 
             if (!res) throw new Error("Invalid JSON response from server");
 
-            const nodesData = res.org_data?.data || [];
+            const nodesDataRaw = res.org_data?.data || [];
+
+            // Pre-process: Parse tags if they are strings
+            const nodesData = nodesDataRaw.map((n: any) => ({
+                ...n,
+                tags: typeof n.tags === 'string' ? JSON.parse(n.tags || '[]') : (n.tags || [])
+            }));
+
             originalNodesRef.current = nodesData;
 
             // FILTER: Split Regular Nodes vs Description Tables
             const regularNodes = nodesData.filter((n: any) =>
-                !n.tags || (Array.isArray(n.tags) && !n.tags.includes("description_table"))
+                !n.tags || !n.tags.includes("description_table")
             );
 
             const tableNodes = nodesData.filter((n: any) =>
-                Array.isArray(n.tags) && n.tags.includes("description_table")
+                n.tags && n.tags.includes("description_table")
             );
 
             // Set Tables State
@@ -378,14 +386,12 @@ export function useOrgChartEditor(
             setDescriptionTables(processedTables);
             descriptionTablesRef.current = processedTables; // Sync Ref immediately for listeners
 
+            setIsPublic(res.is_public || false); // Set Public State
+
             const chartNodes = regularNodes.map((n: any) => {
                 const node = {
                     ...n,
-                    tags: Array.isArray(n.tags)
-                        ? n.tags
-                        : typeof n.tags === 'string'
-                            ? JSON.parse(n.tags || '[]')
-                            : [],
+                    tags: n.tags || [], // Already parsed
                     img: n.img || n.photo || n.image || "",
                 };
 
@@ -419,6 +425,14 @@ export function useOrgChartEditor(
                     node.table_html = "";
                 }
 
+                // Fix for cyclic dependency (pid == stpid)
+                // If a node is inside a group (stpid) and also reports to it (pid), 
+                // it causes layout issues or blank chart in some versions.
+                // We break the link (pid=null) so it's just content inside the group.
+                if (node.pid && node.stpid && node.pid === node.stpid) {
+                    node.pid = null;
+                }
+
                 return node;
             });
 
@@ -445,6 +459,12 @@ export function useOrgChartEditor(
                 },
                 // Disable default click behavior (which opens details/edit)
                 nodeMouseClick: OrgChart.action.none,
+                tags: {
+                    group: { template: "group" },
+                    Emp_probation: { template: "big_v2" },
+                    headcount_open: { template: "big_hc_open" },
+                    description_table: { template: "big_table" } // Map tag to template
+                },
                 nodeMenu: {
                     addDepartment: {
                         text: "Add new department",
@@ -470,12 +490,6 @@ export function useOrgChartEditor(
                         icon: OrgChart.icon.remove(24, 24, "#7A7A7A"),
                         onClick: removeNode
                     }
-                },
-                tags: {
-                    group: { template: "group" },
-                    Emp_probation: { template: "big_v2" },
-                    headcount_open: { template: "big_hc_open" },
-                    description_table: { template: "big_table" } // Map tag to template
                 },
             });
 
@@ -979,7 +993,8 @@ export function useOrgChartEditor(
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                org_data: { data: nodesToSave }
+                org_data: { data: nodesToSave },
+                is_public: isPublic // Include is_public in save
             })
         });
 
@@ -1026,6 +1041,8 @@ export function useOrgChartEditor(
         lastSaveTime,
         hasChanges,
         setHasChanges,
-        chartInstance
+        chartInstance,
+        isPublic,
+        setIsPublic
     };
 }

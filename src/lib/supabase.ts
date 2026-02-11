@@ -9,15 +9,15 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key';
 
-// Validate required environment variables
 // Validate required environment variables
 // Note: We don't throw immediately to allow build process to pass even if env vars are missing
 // (Vercel build might check imports)
-if (!supabaseUrl || !supabaseAnonKey) {
+if (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder-key') {
     console.warn('⚠️ Supabase environment variables are missing. This is fine specifically during build time if not using static generation with DB calls.');
 }
 

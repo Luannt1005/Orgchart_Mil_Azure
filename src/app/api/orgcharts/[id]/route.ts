@@ -40,6 +40,7 @@ export async function GET(
             orgchart_name: data.orgchart_name,
             describe: data.description,
             org_data: JSON.parse(data.org_data || '{"data": []}'),
+            is_public: data.is_public || false,
             username: data.username,
             created_at: data.created_at,
             updated_at: data.updated_at
@@ -65,7 +66,7 @@ export async function PUT(
     try {
         const { id } = await params;
         const data = await request.json();
-        const { org_data, orgchart_name, describe } = data;
+        const { org_data, orgchart_name, describe, is_public } = data;
 
         const pool = await getDbConnection();
         const requestSql = pool.request();
@@ -84,6 +85,10 @@ export async function PUT(
         if (describe !== undefined) {
             requestSql.input('description', sql.NVarChar, describe);
             setClauses.push("description = @description");
+        }
+        if (is_public !== undefined) {
+            requestSql.input('is_public', sql.Bit, is_public ? 1 : 0);
+            setClauses.push("is_public = @is_public");
         }
 
         await requestSql.query(`UPDATE custom_orgcharts SET ${setClauses.join(', ')} WHERE id = @id`);
